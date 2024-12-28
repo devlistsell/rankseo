@@ -635,7 +635,7 @@ class CustomerController extends Controller
             }
         }
 
-        $keywords = Keyword::where('client_id', $customer->id)->latest()->paginate(10);
+        $keywords = Keyword::where('uid', $customer->id)->latest()->paginate(10);
         return view('admin.customers.keywords', [
             'customer' => $customer,
             'contact' => $contact->fill($request->old()),
@@ -812,7 +812,7 @@ class CustomerController extends Controller
             }
             dd($ranking);
             $keyword = new \Acelle\Model\Keyword();
-            $keyword->client_id = $request->client_id;
+            $keyword->uid = $request->client_id;
             $keyword->keyword = $request->keyword;
             $keyword->ranking = $ranking;
             $keyword->difficulty_id = $request->difficulty;

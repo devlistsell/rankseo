@@ -3,8 +3,8 @@
 namespace Acelle\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;  // Ensure you import the Gate facade
 use Acelle\Model\Setting;
-use Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -45,6 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         \Acelle\Model\Plugin::class => \Acelle\Policies\PluginPolicy::class,
         \Acelle\Model\Source::class => \Acelle\Policies\SourcePolicy::class,
         \Acelle\Model\Invoice::class => \Acelle\Policies\InvoicePolicy::class,
+        \Acelle\Model\Keyword::class => \Acelle\Policies\KeywordPolicy::class,
     ];
 
     /**
@@ -53,5 +54,9 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::define('viewKeywords', function ($user, $customer) {
+            return $user->customer->id === $customer->id;
+        });
     }
 }

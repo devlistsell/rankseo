@@ -10,6 +10,8 @@
 | and give it the controller to call when that URI is requested.
 |
 */
+use Acelle\Http\Controllers\KeywordController;
+//use App\Http\Controllers\AccountController;
 
 // Installation
 Route::group(['middleware' => ['installed']], function () {
@@ -277,6 +279,10 @@ Route::group(['middleware' => ['not_installed', 'auth', '2fa']], function () {
 
 Route::group(['middleware' => ['not_installed', 'auth', 'frontend', '2fa']], function () {
     // Checkout
+    
+    Route::get('account/keywords', 'KeywordController@keywordsListing')->name('keywords.listing');
+    Route::get('account/keywords/history', 'KeywordController@allKeywordsHistory')->name('allKeywordsHistory');
+
     Route::get('checkout/{invoice_uid}/transactions/list', 'CheckoutController@transactionList');
     Route::get('checkout/{invoice_uid}/invoices/list', 'CheckoutController@invoiceList');
     Route::post('checkout/{invoice_uid}/cancel', 'CheckoutController@cancel');
@@ -1396,4 +1402,9 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['not_installed', 'auth', 
     Route::post('admin/translation/save', 'TranslationController@phrasesSave');
     Route::post('admin/translation/finish-write', 'TranslationController@phrasesFinishWrite');
     Route::post('admin/translation/{uid}/write', 'TranslationController@phrasesWrite');
+
+
 });
+
+
+

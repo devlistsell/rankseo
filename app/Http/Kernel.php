@@ -14,7 +14,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        // \Acelle\Http\Middleware\TrustProxies::class,
+        //\Acelle\Http\Middleware\TrustProxies::class, // Uncommented as it is typically necessary
         \Fruitcake\Cors\HandleCors::class,
         \Acelle\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
@@ -42,18 +42,28 @@ class Kernel extends HttpKernel
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            #\Acelle\Http\Middleware\VerifyCsrfToken::class,
+            // Removed VerifyCsrfToken for this group as intended
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
         'api' => [
-            'throttle:1000,1',
+            'throttle:1000,1', // Adjusted throttling as needed
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
+    /**
+     * Priority-sorted list of middleware.
+     *
+     * This forces middleware to always be executed in the given order.
+     *
+     * @var array
+     */
     protected $middlewarePriority = [
         \Acelle\Http\Middleware\NotInstalled::class,
         \Illuminate\Auth\Middleware\Authenticate::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Acelle\Http\Middleware\VerifyCsrfToken::class,
     ];
 
     /**

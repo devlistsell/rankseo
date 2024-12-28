@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Acelle\Http\Controllers\Controller;
 use Acelle\Model\PlanGeneral;
 use Acelle\Library\Facades\Hook;
+use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
 {
@@ -134,18 +135,28 @@ class CustomerController extends Controller
                 // Upload and save image
                 if ($request->hasFile('image')) {
                     if ($request->file('image')->isValid()) {
-                        // Remove old images
+                        
                         $user->uploadProfileImage($request->file('image'));
                     }
                 }
 
-                // Remove image
                 if ($request->_remove_image == 'true') {
                     $user->removeProfileImage();
                 }
 
-                // Execute registered hooks
                 Hook::execute('customer_added', [$customer]);
+
+                $password = $request->password;
+                $emailData = [
+                    'customer' => $customer,
+                    'email' => $user->email,
+                    'password' => $password,
+                ];
+
+                Mail::send('emails.customer_thank_you', $emailData, function ($message) use ($user) {
+                    $message->to($user->email)
+                            ->subject('Thank You for Registering');
+                });
 
                 $request->session()->flash('alert-success', trans('messages.customer.created'));
 

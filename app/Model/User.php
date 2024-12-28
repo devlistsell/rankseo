@@ -811,4 +811,10 @@ class User extends Authenticatable
     {
         return $this->enable_2fa_google_authenticator && $this->google_2fa_secret_key;
     }
+
+    // Define the relationship: One user has many keywords
+    public function keywords()
+    {
+        return $this->hasMany(Keyword::class, 'uid'); // Assuming `uid` is the foreign key in the `keywords` table
+    }
 }

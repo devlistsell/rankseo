@@ -44,6 +44,9 @@
                     <div class="col-md-6">
                         @include('helpers.form_control', ['type' => 'text', 'name' => 'first_name', 'value' => $customer->user->first_name, 'rules' => $customer->user->rules()])
                     </div>
+                    <div class="col-md-6">
+                        @include('helpers.form_control', ['type' => 'text', 'name' => 'website', 'value' => $customer->user->website, 'rules' => $customer->user->rules()])
+                    </div>
                 </div>
             @else 
                 <div class="row">
@@ -52,6 +55,9 @@
                     </div>
                     <div class="col-md-6">
                         @include('helpers.form_control', ['type' => 'text', 'name' => 'last_name', 'value' => $customer->user->last_name, 'rules' => $customer->user->rules()])
+                    </div>
+                    <div class="col-md-6">
+                        @include('helpers.form_control', ['type' => 'text', 'name' => 'website', 'value' => $customer->user->website, 'rules' => $customer->user->rules()])
                     </div>
                 </div>
             @endif

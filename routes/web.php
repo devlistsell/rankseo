@@ -1186,6 +1186,10 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['not_installed', 'auth', 
     Route::get('admin/customers/disable', 'CustomerController@disable');
     Route::get('admin/customers/enable', 'CustomerController@enable');
     Route::resource('admin/customers', 'CustomerController');
+    Route::get('admin/customers/{id}/keywords', 'CustomerController@keywords');
+    Route::post('admin/customers/search/keywords', 'CustomerController@search_keywords')->name('admin.searchkeyword');
+    Route::post('admin/customers/save/keywords', 'CustomerController@save_keywords')->name('admin.savekeyword');
+
 
     // Admin Group
     Route::get('admin/admin_groups/listing/{page?}', 'AdminGroupController@listing');

@@ -1,15 +1,28 @@
 <?php
-
 namespace Acelle\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use Acelle\Http\Controllers\Controller;
 use Acelle\Model\PlanGeneral;
 use Acelle\Library\Facades\Hook;
+use Acelle\Model\Keyword;
+use Google\Client;
+use Google\Service\SearchConsole;
+use Google\Service\SearchConsole\SearchAnalyticsQueryRequest;
+use Google\Service\SearchConsole\ApiDimensionFilter;
+use Google\Service\SearchConsole\ApiDimensionFilterGroup;
+// use Acelle\Services\GoogleSearchConsoleService;
 use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
 {
+    // protected $googleSearchConsole;
+
+    // public function __construct(GoogleSearchConsoleService $googleSearchConsole)
+    // {
+    //     $this->googleSearchConsole = $googleSearchConsole;
+    // }
+
     /**
      * Display a listing of the resource.
      *
@@ -172,9 +185,7 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-    }
+    public function show($id) {}
 
     /**
      * Show the form for editing the specified resource.
@@ -584,4 +595,290 @@ class CustomerController extends Controller
             'url' => $customer->user->generateOneClickLoginUrl(),
         ]);
     }
+
+    public function keywords(Request $request, $uid)
+    {
+        // Get current user
+        $customer = \Acelle\Model\Customer::findByUid($uid);
+
+        // authorize
+        if (\Gate::denies('update', $customer)) {
+            return $this->notAuthorized();
+        }
+
+        if ($customer->contact) {
+            $contact = $customer->contact;
+        } else {
+            $contact = new \Acelle\Model\Contact([
+                'first_name' => $customer->user->first_name,
+                'last_name' => $customer->user->last_name,
+                'email' => $customer->user->email,
+            ]);
+        }
+
+        // Create new company if null
+        if (!$contact) {
+            $contact = new \Acelle\Model\Contact();
+        }
+
+        // save posted data
+        if ($request->isMethod('post')) {
+            $this->validate($request, \Acelle\Model\Contact::$rules);
+
+            $contact->fill($request->all());
+
+            // Save current user info
+            if ($contact->save()) {
+                $customer->contact_id = $contact->id;
+                $customer->save();
+                $request->session()->flash('alert-success', trans('messages.customer_contact.updated'));
+            }
+        }
+
+        $keywords = Keyword::where('client_id', $customer->id)->latest()->paginate(10);
+        return view('admin.customers.keywords', [
+            'customer' => $customer,
+            'contact' => $contact->fill($request->old()),
+            'keywords' => $keywords,
+        ]);
+    }
+
+    public function search_keywords(Request $request)
+    {
+        $clientId = $request->client_id;
+        $keyword = $request->keyword; // Single keyword to filter
+        if (empty($keyword) || empty($clientId)) {
+            return response()->json(['status' => 'empty', 'message' => 'Please add required field!']);
+        }
+        try {
+            $clientDetail = \Acelle\Model\User::where('id', $clientId)->first();
+            if (!$clientDetail || empty($clientDetail->website)) {
+                return response()->json(['status' => 'site', 'message' => 'Client website is required!']);
+            }
+
+            $client = new Client();
+            $client->setApplicationName('RankSeo');
+            $client->setAuthConfig(storage_path('app/google_service_account.json')); // Path to your service account credentials
+            $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+            // Create a SearchConsole service instance
+            $searchConsole = new SearchConsole($client);
+
+            // Set the site URL
+            $siteUrl = $clientDetail->website;
+
+            // Set the date range for the query
+            $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+            $endDate = now()->toDateString(); // Current date
+
+            // Set the request body parameters
+            $requestBody = new SearchAnalyticsQueryRequest();
+            $requestBody->setStartDate($startDate);
+            $requestBody->setEndDate($endDate);
+            $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+            $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+            // Define the filter for a single keyword
+            $filter = new ApiDimensionFilter([
+                'dimension' => 'query',
+                'operator' => 'equals',
+                'expression' => $keyword // Replace with the single keyword
+            ]);
+
+            // Group the filter into a filter group
+            $filterGroup = new ApiDimensionFilterGroup([
+                'filters' => [$filter]
+            ]);
+
+            // Add the filter group to the request body
+            $requestBody->setDimensionFilterGroups([$filterGroup]);
+
+            // Make the request to the Google API
+            $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+            // Handle the response
+            $rankings = $response->getRows();
+            if ($rankings) {
+                // Loop through the rankings and send one key and position at a time
+                foreach ($rankings as $row) {
+                    // Assuming the keyword is in $row['keys'][0] and the position in $row['position']
+                    $key = $row['keys'][0]; // The keyword
+                    $position = $row['position']; // The position
+                    return response()->json(['status' => true, 'key' => $key, 'position' => $position, 'message'=>'Successfully']);
+                }
+            }
+            throw new \Exception('No data found for the keyword.');
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Failed to retrieve keyword data!']);
+        }
+    }
+
+
+    // public function search_keywords(Request $request)
+    // {
+    //     $clientId = $request->client_id;
+    //     $keyword = $request->keyword; // Single keyword to filter
+    //     if (empty($keyword) || empty($clientId)) {
+    //         return response()->json(['status' => 'empty', 'message' => 'Please add required field!']);
+    //     }
+    //     try {
+
+    //         $clientDetail = \Acelle\Model\User::where('id', $clientId)->first();
+    //         if (!$clientDetail || empty($clientDetail->website)) {
+    //             return response()->json(['status' => 'site', 'message' => 'Client website is required!']);
+    //         }
+
+    //         $client = new Client();
+    //         $client->setApplicationName('RankSeo');
+    //         $client->setAuthConfig(storage_path('app\google_service_account.json')); // Path to your service account credentials
+    //         $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+    //         // Create a SearchConsole service instance
+    //         $searchConsole = new SearchConsole($client);
+
+    //         // Set the site URL
+    //         $siteUrl = $clientDetail->website; //'https://sa-kat.de';
+
+    //         // Set the date range for the query
+    //         $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+    //         $endDate = now()->toDateString(); // Current date
+
+    //         // Set the request body parameters
+    //         $requestBody = new SearchAnalyticsQueryRequest();
+    //         $requestBody->setStartDate($startDate);
+    //         $requestBody->setEndDate($endDate);
+    //         $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+    //         $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+    //         // Define the filter for a single keyword
+    //         $filter = new ApiDimensionFilter([
+    //             'dimension' => 'query',
+    //             'operator' => 'equals',
+    //             'expression' => $keyword // Replace with the single keyword
+    //         ]);
+
+    //         // Group the filter into a filter group
+    //         $filterGroup = new ApiDimensionFilterGroup([
+    //             'filters' => [$filter]
+    //         ]);
+
+    //         // Add the filter group to the request body
+    //         $requestBody->setDimensionFilterGroups([$filterGroup]);
+
+    //         // Make the request to the Google API
+    //         $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+    //         // Handle the response
+    //         $rankings = $response->getRows();
+    //         if ($rankings) {
+    //             $keys = [];
+    //             $positions = [];
+    //             foreach ($rankings as $row) {
+    //                 $keys[] = $row['keys'][0];
+    //                 $positions[] = $row['position'];
+    //             }
+    //             return response()->json(['status' => true, 'key' => $keys, 'ranking' => $positions]);
+    //         }
+    //         throw new \Exception('Failed to save the keyword.');
+    //     } catch (\Exception $e) {
+    //         return response()->json(['status' => false, 'message' => 'Failed to add keyword!']);
+    //     }
+    // }
+
+    public function save_keywords(Request $request)
+    {
+        try {
+            if (empty($request->client_id) || empty($request->keyword) || empty($request->ranking) || empty($request->difficulty)) {
+                return response()->json(['status' => 'error', 'message' => 'Please add required field!']);
+            }
+
+            if (Keyword::where(['client_id' => $request->client_id, 'keyword' => $request->keyword])->count() > 0) {
+                return response()->json(['status' => '0']);
+            }
+            
+            $value = $request->ranking;
+
+            if (is_float($value) && floor($value) != $value) {dd('1');
+                // The value is a decimal (e.g., 1.23, 3.5)
+                return response()->json(['status' => true, 'message' => 'Value is a decimal number.']);
+            } else {dd('2');
+                // The value is not a decimal (either integer or non-numeric)
+                return response()->json(['status' => false, 'message' => 'Value is not a decimal.']);
+            }
+            if(is_float($request->ranking)){dd(12);
+                $ranking = round($request->ranking,2);
+            }else{
+                $ranking = $request->ranking;
+            }
+            dd($ranking);
+            $keyword = new \Acelle\Model\Keyword();
+            $keyword->client_id = $request->client_id;
+            $keyword->keyword = $request->keyword;
+            $keyword->ranking = $ranking;
+            $keyword->difficulty_id = $request->difficulty;
+
+            if ($keyword->save()) {
+                $request->session()->flash('alert-success', 'keyword added successfully');
+                return response()->json(['status' => true]);
+            }
+            throw new \Exception('Failed to save the keyword.');
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Failed to add keyword!']);
+        }
+    }
+
+    // public function search_keywords(Request $request)
+    // {
+    //     $clientId = $request->client_id;
+    //     $keyword = $request->keyword;
+
+    //     // Set up the Google Client
+    //     $client = new Client();
+    //     $client->setApplicationName('Your Application Name');
+    //     $client->setAuthConfig(storage_path('app\google_service_account.json')); // Path to your service account credentials
+    //     $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+    //     // dd($client);
+    //     // Create a SearchConsole service instance
+    //     $searchConsole = new SearchConsole($client);
+
+    //     // Set the site URL (URL encoded)
+    //     $siteUrl = 'https://sa-kat.de'; // Example: replace with the actual site URL
+    //     $encodedSiteUrl = urlencode($siteUrl);
+
+    //     // Set the API endpoint
+    //     $apiEndpoint = "https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fsa-kat.de/searchAnalytics/query";
+
+    //     // Set the date range for the query
+    //     $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+    //     $endDate = now()->toDateString(); // Current date
+
+    //     // Set the request body parameters
+    //     $requestBody = new SearchAnalyticsQueryRequest();
+    //     $requestBody->setStartDate($startDate);
+    //     $requestBody->setEndDate($endDate);
+    //     $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+    //     $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+    //     // Make the request to the Google API
+    //     $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+    //     // Handle the response
+    //     $rankings = $response->getRows();
+
+    //     // Debug and inspect the rankings data
+    //     dd($rankings);
+
+    //     // Return view with the rankings data
+    //     return view('keyword-rankings', compact('rankings'));
+
+
+    //     // $siteUrl = 'https://www.googleapis.com/webmasters/v3/sites/https%3A%2F%2Fsa-kat.de/searchAnalytics/query';
+    //     // $startDate = now()->subDays(3)->toDateString(); // Last 30 days
+    //     // $endDate = now()->toDateString();
+
+    //     // $rankings = $this->googleSearchConsole->getKeywordRankings($siteUrl, $startDate, $endDate);
+    //     // dd($rankings);
+    //     // return view('keyword-rankings', compact('rankings'));
+    // }
 }

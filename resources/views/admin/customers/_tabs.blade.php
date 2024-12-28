@@ -22,5 +22,10 @@
                 <span class="material-symbols-rounded">approval</span> {{ trans('messages.customer.sub_account') }}</a>
             </li>
         @endcan
+        <li class="nav-item 
+        {{ request()->route()->getActionName() == 'Acelle\Http\Controllers\Admin\CustomerController@keywords' ? 'active' : '' }}
+        text-semibold"><a class="nav-link" href="{{ action('Admin\CustomerController@keywords', $customer->uid) }}">
+            <span class="material-symbols-rounded">assignment_turned_in</span> Keywords</a>
+        </li>
     </ul>
 </div>

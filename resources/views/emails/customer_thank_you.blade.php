@@ -11,6 +11,8 @@
         <li><strong>Email:</strong> {{ $email }}</li>
         <li><strong>Password:</strong> {{ $password }}</li>
     </ul>
+    <p>You can log in using the following link:</p>
+    <a href="{{ $loginUrl }}">{{ $loginUrl }}</a>
     <p>Please keep this information secure and do not share it with anyone.</p>
     <p>Best regards,<br>The Team</p>
 </body>

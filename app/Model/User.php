@@ -595,6 +595,10 @@ class User extends Authenticatable
             $user->first_name = $params['name'];
         }
 
+        if (isset($params['website'])) {
+            $user->website = $params['website'];
+        }
+
         if (isset($params['email'])) {
             $user->email = $params['email'];
         }

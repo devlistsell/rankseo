@@ -1,4 +1,5 @@
 <?php
+
 namespace Acelle\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
@@ -148,7 +149,7 @@ class CustomerController extends Controller
                 // Upload and save image
                 if ($request->hasFile('image')) {
                     if ($request->file('image')->isValid()) {
-                        
+
                         $user->uploadProfileImage($request->file('image'));
                     }
                 }
@@ -168,7 +169,7 @@ class CustomerController extends Controller
 
                 Mail::send('emails.customer_thank_you', $emailData, function ($message) use ($user) {
                     $message->to($user->email)
-                            ->subject('Thank You for Registering');
+                        ->subject('Thank You for Registering');
                 });
 
                 $request->session()->flash('alert-success', trans('messages.customer.created'));
@@ -651,6 +652,9 @@ class CustomerController extends Controller
             return response()->json(['status' => 'empty', 'message' => 'Please add required field!']);
         }
         try {
+            if (Keyword::where(['uid' => $request->client_id, 'keyword' => $request->keyword])->count() > 0) {
+                return response()->json(['status' => 'exist']);
+            }
             $clientDetail = \Acelle\Model\User::where('id', $clientId)->first();
             if (!$clientDetail || empty($clientDetail->website)) {
                 return response()->json(['status' => 'site', 'message' => 'Client website is required!']);
@@ -704,7 +708,7 @@ class CustomerController extends Controller
                     // Assuming the keyword is in $row['keys'][0] and the position in $row['position']
                     $key = $row['keys'][0]; // The keyword
                     $position = $row['position']; // The position
-                    return response()->json(['status' => true, 'key' => $key, 'position' => $position, 'message'=>'Successfully']);
+                    return response()->json(['status' => true, 'key' => $key, 'position' => $position, 'message' => 'Successfully']);
                 }
             }
             throw new \Exception('No data found for the keyword.');
@@ -792,29 +796,13 @@ class CustomerController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Please add required field!']);
             }
 
-            if (Keyword::where(['client_id' => $request->client_id, 'keyword' => $request->keyword])->count() > 0) {
+            if (Keyword::where(['uid' => $request->client_id, 'keyword' => $request->keyword])->count() > 0) {
                 return response()->json(['status' => '0']);
             }
-            
-            $value = $request->ranking;
-
-            if (is_float($value) && floor($value) != $value) {dd('1');
-                // The value is a decimal (e.g., 1.23, 3.5)
-                return response()->json(['status' => true, 'message' => 'Value is a decimal number.']);
-            } else {dd('2');
-                // The value is not a decimal (either integer or non-numeric)
-                return response()->json(['status' => false, 'message' => 'Value is not a decimal.']);
-            }
-            if(is_float($request->ranking)){dd(12);
-                $ranking = round($request->ranking,2);
-            }else{
-                $ranking = $request->ranking;
-            }
-            dd($ranking);
             $keyword = new \Acelle\Model\Keyword();
             $keyword->uid = $request->client_id;
             $keyword->keyword = $request->keyword;
-            $keyword->ranking = $ranking;
+            $keyword->ranking = round($request->ranking, 2);
             $keyword->difficulty_id = $request->difficulty;
 
             if ($keyword->save()) {

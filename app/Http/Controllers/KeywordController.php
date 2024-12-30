@@ -28,11 +28,9 @@ class KeywordController extends Controller
             return abort(403, trans('messages.not_authorized'));
         }
 
-        // Handle AJAX request for DataTables
         if ($request->ajax()) {
             $keywords = $user->keywords();
 
-            // Apply global search filter (search term)
             if ($request->has('search') && $request->search['value']) {
                 $searchTerm = $request->search['value'];
                 $keywords = $keywords->where('keyword', 'like', '%' . $searchTerm . '%');
@@ -41,25 +39,40 @@ class KeywordController extends Controller
             return DataTables::of($keywords)
                 ->addIndexColumn()
                 ->editColumn('keyword', function ($row) {
-                    return $row->keyword; // Assuming the 'keyword' column is directly accessible
+                    return $row->keyword;
                 })
                 ->editColumn('ranking', function ($row) {
                     return $row->ranking;
                 })
                 ->editColumn('difficulty', function ($row) {
-                    return $row->difficulty;
+                    if($row->difficulty_id == 1)
+                    {
+                        $difficulty = '0-49';
+                    }
+                    elseif ($row->difficulty_id == 2) {
+                        $difficulty = '50-69';
+                    }
+
+                    elseif ($row->difficulty_id == 3) {
+                        $difficulty = '70+';
+                    }
+                    else
+                    {
+                        $difficulty = '--';
+                    }
+                    return $difficulty;
+                    
                 })
                 ->editColumn('date', function ($row) {
-                    return $row->formatDate(); // Use the `formatDate` method for display
+                    return $row->formatDate(); 
                 })
                 ->editColumn('time', function ($row) {
-                    return $row->formatTime(); // Use the `formatTime` method for display
+                    return $row->formatTime();
                 })
                 ->rawColumns(['keyword', 'ranking', 'difficulty', 'date', 'time'])
                 ->make(true);
         }
 
-        // Render the regular view
         return view('account.keywords_listing', [
             'user' => $user,
         ]);
@@ -77,19 +90,16 @@ class KeywordController extends Controller
             return abort(403, trans('messages.not_authorized'));
         }
 
-        // If it's an AJAX request (for DataTables)
         if ($request->ajax()) {
             $history = KeywordHistory::with('keyword')
                 ->whereIn('keyword_id', $user->keywords()->pluck('id'));
 
-            // Apply date range filter if 'from_date' and 'to_date' are present in the request
             if ($request->filled('from_date') && $request->filled('to_date')) {
                 $fromDate = Carbon::parse($request->from_date)->startOfDay();
                 $toDate = Carbon::parse($request->to_date)->endOfDay();
                 $history = $history->whereBetween('date_time', [$fromDate, $toDate]);
             }
 
-            // Apply global search filter (search term)
             if ($request->has('search') && $request->search['value']) {
                 $searchTerm = $request->search['value'];
                 $history = $history->whereHas('keyword', function ($query) use ($searchTerm) {

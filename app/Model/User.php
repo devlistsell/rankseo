@@ -65,7 +65,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 'first_name', 'last_name'
+        'email', 'first_name', 'last_name', 'website'
     ];
 
     /**
@@ -593,6 +593,10 @@ class User extends Authenticatable
 
         if (isset($params['name'])) {
             $user->first_name = $params['name'];
+        }
+
+        if (isset($params['website'])) {
+            $user->website = $params['website'];
         }
 
         if (isset($params['email'])) {

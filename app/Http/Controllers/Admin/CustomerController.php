@@ -1,4 +1,5 @@
 <?php
+
 namespace Acelle\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
@@ -113,17 +114,14 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        // Get current user
         $current_user = $request->user();
         $customer = \Acelle\Model\Customer::newCustomer();
         $contact = new \Acelle\Model\Contact();
 
-        // authorize
         if (\Gate::denies('create', $customer)) {
             return $this->notAuthorized();
         }
 
-        // save posted data
         if ($request->isMethod('post')) {
             $user = new \Acelle\Model\User();
             $user->fill($request->all());
@@ -131,13 +129,11 @@ class CustomerController extends Controller
 
             $this->validate($request, $user->rules());
 
-            // Update password
             if (!empty($request->password)) {
                 $user->password = bcrypt($request->password);
             }
             $user->save();
 
-            // Save current user info
             $customer->admin_id = $request->user()->admin->id;
             $customer->fill($request->all());
             $customer->status = 'active';
@@ -145,10 +141,9 @@ class CustomerController extends Controller
             if ($customer->save()) {
                 $user->customer_id = $customer->id;
                 $user->save();
-                // Upload and save image
+
                 if ($request->hasFile('image')) {
                     if ($request->file('image')->isValid()) {
-
                         $user->uploadProfileImage($request->file('image'));
                     }
                 }
@@ -160,16 +155,22 @@ class CustomerController extends Controller
                 Hook::execute('customer_added', [$customer]);
 
                 $password = $request->password;
+                $loginUrl = route('login');
                 $emailData = [
                     'customer' => $customer,
                     'email' => $user->email,
                     'password' => $password,
+                    'loginUrl' => $loginUrl,
                 ];
 
-                Mail::send('emails.customer_thank_you', $emailData, function ($message) use ($user) {
-                    $message->to($user->email)
-                        ->subject('Thank You for Registering');
-                });
+                try {
+                    Mail::send('emails.customer_thank_you', $emailData, function ($message) use ($user) {
+                        $message->to($user->email)
+                            ->subject('Thank You for Registering');
+                    });
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send email to customer: ' . $e->getMessage());
+                }
 
                 $request->session()->flash('alert-success', trans('messages.customer.created'));
 
@@ -177,6 +178,7 @@ class CustomerController extends Controller
             }
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -600,7 +602,6 @@ class CustomerController extends Controller
     {
         // Get current user
         $customer = \Acelle\Model\Customer::findByUid($uid);
-
         // authorize
         if (\Gate::denies('update', $customer)) {
             return $this->notAuthorized();

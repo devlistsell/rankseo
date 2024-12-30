@@ -35,7 +35,7 @@ class Contact extends Model
      * @var array
      */
     protected $fillable = [
-        'email', 'first_name', 'last_name', 'address_1', 'address_2', 'city', 'zip', 'url', 'company', 'phone', 'state', 'country_id',
+        'email', 'first_name', 'last_name', 'website','address_1', 'address_2', 'city', 'zip', 'url', 'company', 'phone', 'state', 'country_id',
         'tax_number', 'billing_address',
     ];
 
@@ -48,6 +48,7 @@ class Contact extends Model
         'email' => 'required|email',
         'first_name' => 'required',
         'last_name' => 'required',
+        // 'website' => 'required',
         'address_1' => 'required',
         'state' => 'required',
         'city' => 'required',

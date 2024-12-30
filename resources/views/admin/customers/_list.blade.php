@@ -9,7 +9,7 @@
                 </td>
                 <td>
                     <h5 class="m-0 text-bold">
-                        <a class="kq_search d-block" href="{{ action('Admin\CustomerController@edit', $customer->uid) }}">{{ $customer->displayName() }}</a>
+                        <a class="kq_search d-block" href="{{ action('Admin\CustomerController@keywords', $customer->uid) }}">{{ $customer->displayName() }}</a>
                     </h5>
                     <span class="text-muted kq_search">{{ $customer->user->email }}</span><br>
                     <span class="text-muted kq_search">{{ trans('messages.customer.bounce_feedback_rate') }} <span title="{{ trans('messages.customer.bounce_feedback_rate_desc') }}" class="xtooltip">{{ number_to_percentage($customer->readCache('Bounce/FeedbackRate') ?? 0) }}</span></span>
@@ -71,7 +71,7 @@
                             class="btn btn-primary btn-icon"><span class="material-symbols-rounded">login</span></a>
                     @endcan
                     @can('update', $customer)
-                        <a href="{{ action('Admin\CustomerController@edit', $customer->uid) }}"
+                        <a href="{{ action('Admin\CustomerController@keywords', $customer->uid) }}"
                             data-popup="tooltip" title="{{ trans('messages.edit') }}"
                             role="button" class="btn btn-secondary btn-icon"><span class="material-symbols-rounded">edit</span></a>
                     @endcan

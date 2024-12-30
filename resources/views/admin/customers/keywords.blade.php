@@ -149,6 +149,11 @@
                     return false;
                 }
                 $(".keyword_error").addClass("hide");
+                $(".keyword_exist_error").addClass("hide");
+
+                $(this).html('Please Wait');
+                $(this).addClass('loading');
+                addButtonLoadingEffect($(this));
                 $.ajax({
                     url: "{{ route('admin.searchkeyword') }}",
                     type: "POST",
@@ -158,10 +163,16 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
+                        $('.search_btn').html('Search');
+                        $(".search_btn").removeClass('loading button-loading');
                         if (response.status == true) {
+                            $(".search_btn").addClass("hide");
                             $('#success-message').text(response.message).show();
                             $('#rank').val(response.position);
                             $(".search-related").removeClass('hide');
+                        }else if (response.status == 'exist') {
+                            $('.keyword_exist_error').removeClass('hide');
+                            return false;
                         }else if (response.status == 'site') {
                             $("#error-message").text(response.message).show();
                             return false;
@@ -174,7 +185,8 @@
                     },
                     error: function(xhr, status, error) {
                         // Handle error
-                        console.error("Error:", error);
+                        $('.search_btn').html('Search');
+                        $(".search_btn").removeClass('loading button-loading');
                     }
                 });
             });
@@ -182,6 +194,7 @@
             $(".submit_btn").click(function() {
                 let error = 1;
                 $('#error-message').hide();
+                $('#success-message').hide();
                 if ($('#keyword').val().trim() == '') {
                     $('.keyword_error').removeClass('hide');
                     error = 0;
@@ -228,5 +241,9 @@
                 });
             });
         });
+        function addButtonLoadingEffect(button) {
+            button.addClass('button-loading');
+            button.append('<div class="loader"></div>');
+        }
     </script>
 @endsection

@@ -12,7 +12,64 @@ use Mika56\SPFCheck\DNSRecordGetterDirect;
 use Mika56\SPFCheck\DNSRecordGetter;
 use DB;
 use Illuminate\Support\Facades\File;
+use Google\Client;
+use Google\Service\SearchConsole;
+use Google\Service\SearchConsole\SearchAnalyticsQueryRequest;
+use Google\Service\SearchConsole\ApiDimensionFilter;
+use Google\Service\SearchConsole\ApiDimensionFilterGroup;
 
+function keywordSearch($data, $clientDetail)
+{
+    $keyword = $data['keyword'];
+    $client = new Client();
+    $client->setApplicationName('RankSeo');
+    $client->setAuthConfig(storage_path('app/google_service_account.json')); // Path to your service account credentials
+    $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+    // Create a SearchConsole service instance
+    $searchConsole = new SearchConsole($client);
+
+    // Set the site URL
+    $siteUrl = $clientDetail->website;
+
+    // Set the date range for the query
+    $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+    $endDate = now()->toDateString(); // Current date
+
+    // Set the request body parameters
+    $requestBody = new SearchAnalyticsQueryRequest();
+    $requestBody->setStartDate($startDate);
+    $requestBody->setEndDate($endDate);
+    $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+    $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+    // Define the filter for a single keyword
+    $filter = new ApiDimensionFilter([
+        'dimension' => 'query',
+        'operator' => 'equals',
+        'expression' => $keyword // Replace with the single keyword
+    ]);
+
+    // Group the filter into a filter group
+    $filterGroup = new ApiDimensionFilterGroup([
+        'filters' => [$filter]
+    ]);
+
+    // Add the filter group to the request body
+    $requestBody->setDimensionFilterGroups([$filterGroup]);
+
+    // Make the request to the Google API
+    $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+    // Handle the response
+    $rankings = $response->getRows();
+    
+    if ($rankings) {
+        return $rankings;
+    }else{
+        return [];
+    }
+}
 function generatePublicPath($absPath, $withHost = false)
 {
     // Notice: $relativePath must be relative to storage/ folder
@@ -53,11 +110,11 @@ function generatePublicPath($absPath, $withHost = false)
         // Return something like
         //     "http://localhost/{subdirectory if any}/p/assets/ef99238abc92f43e038efb"   # withHost = true, OR
         //     "/p/assets/ef99238abc92f43e038efb"                   # withHost = false
-        $url = route('public_assets', [ 'dirname' => $encodedDirname, 'basename' => rawurlencode($basename) ], $withHost);
+        $url = route('public_assets', ['dirname' => $encodedDirname, 'basename' => rawurlencode($basename)], $withHost);
     } else {
         // Make sure the $subdirectory has a leading slash ('/')
         $subdirectory = join_paths('/', $subdirectory);
-        $url = join_paths($subdirectory, route('public_assets', [ 'dirname' => $encodedDirname, 'basename' => $basename ], $withHost));
+        $url = join_paths($subdirectory, route('public_assets', ['dirname' => $encodedDirname, 'basename' => $basename], $withHost));
     }
 
     return $url;
@@ -122,7 +179,7 @@ function updateTranslationFile($targetFile, $sourceFile, $overwriteTargetPhrases
         ksort($merged);
     }
 
-    $out = '<?php return '.var_export(\Yaml::parse(\Yaml::dump($merged)), true).' ?>';
+    $out = '<?php return ' . var_export(\Yaml::parse(\Yaml::dump($merged)), true) . ' ?>';
     \Illuminate\Support\Facades\File::put($targetFile, $out);
 }
 
@@ -306,7 +363,7 @@ function url_get_contents_ssl_safe($url)
 {
     // Check if $url is a URL
     if (!preg_match('/^https{0,1}:\/\//', $url)) {
-        throw new \Exception('url_get_contents_ssl_safe() requires a URL as input. Received: '.$url);
+        throw new \Exception('url_get_contents_ssl_safe() requires a URL as input. Received: ' . $url);
     }
 
     $client = curl_init();
@@ -325,7 +382,7 @@ function url_get_contents_ssl_safe($url)
 
 function is_non_web_link($url)
 {
-    $preserved = [ '#', 'mailto:', 'tel:', 'file:', 'ftp:', 'rss:', 'feed:', ':telnet', 'gopher:', 'ssh:', 'nntp:'];
+    $preserved = ['#', 'mailto:', 'tel:', 'file:', 'ftp:', 'rss:', 'feed:', ':telnet', 'gopher:', 'ssh:', 'nntp:'];
 
     // Important: do not use filter_var($url, FILTER_VALIDATE_URL);
     $matched = false;
@@ -368,7 +425,7 @@ function load_env_from_file($path)
             $value = trim($value);
         }
 
-        $output[ $key ] = $value;
+        $output[$key] = $value;
     }
 
     return $output;
@@ -474,14 +531,13 @@ function with_rate_limits(array $rateTrackers, $rateTrackersPool, $rateExceeding
                 }
 
                 $passed = true;
-            } catch(\Acelle\Library\Exception\RateLimitExceeded $rateException) {
+            } catch (\Acelle\Library\Exception\RateLimitExceeded $rateException) {
                 $passed = false;
             }
-        } while(false == $passed);
+        } while (false == $passed);
 
         // MUST return
         return $selectedServer;
-
     } catch (\Acelle\Library\Exception\RateLimitExceeded $exception) {
         if (!$testMode) {
             // Credits must not be counted
@@ -597,7 +653,7 @@ function read_csv($file, $headerLine = false, $ignoreEmptyHeader = false)
     } catch (\Exception $ex) {
         // @todo: translation here
         // Common errors that will be catched: duplicate column, empty column
-        throw new \Exception('Invalid headers. Original error message is: '.$ex->getMessage());
+        throw new \Exception('Invalid headers. Original error message is: ' . $ex->getMessage());
     }
 }
 
@@ -605,7 +661,7 @@ function plogger($name = null)
 {
     $formatter = new \Monolog\Formatter\LineFormatter("[%datetime%] %channel%.%level_name%: %message%\n");
     $pid = getmypid();
-    $logfile = storage_path(join_paths('logs', php_sapi_name(), '/process-'.$pid.'.log'));
+    $logfile = storage_path(join_paths('logs', php_sapi_name(), '/process-' . $pid . '.log'));
     $stream = new \Monolog\Handler\RotatingFileHandler($logfile, 0, config('custom.log_level'));
     $stream->setFormatter($formatter);
 
@@ -675,7 +731,7 @@ function curl_download($url, $filepath)
     curl_setopt($ch, CURLOPT_FILE, $fp);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
-    $data = curl_exec($ch);// get curl response
+    $data = curl_exec($ch); // get curl response
 
     if (curl_errno($ch)) {
         // Something went wrong
@@ -688,7 +744,7 @@ function curl_download($url, $filepath)
 
 function create_temp_db_table($fields, $data, Closure $callback)
 {
-    $name = "__tmp_from_array_".uniqid();
+    $name = "__tmp_from_array_" . uniqid();
     $nameWithPrefix = table($name);
     $fieldsString = implode(', ', $fields);
 
@@ -728,12 +784,12 @@ function convertPrice($amount, $fromCurrency, $toCurrency)
 
     // Check if the currencies exist in the exchange rates array
     if (!isset($exchangeRates[$fromCurrency])) {
-        throw new Exception('From currency code ['.$fromCurrency.'] is not in exchange rates array. Update the exchange rates.');
+        throw new Exception('From currency code [' . $fromCurrency . '] is not in exchange rates array. Update the exchange rates.');
     }
 
     // Check if the currencies exist in the exchange rates array
     if (!isset($exchangeRates[$toCurrency])) {
-        throw new Exception('To currency code ['.$toCurrency.'] is not in exchange rates array. Update the exchange rates.');
+        throw new Exception('To currency code [' . $toCurrency . '] is not in exchange rates array. Update the exchange rates.');
     }
 
     // Convert the amount to the base currency (USD in this case)

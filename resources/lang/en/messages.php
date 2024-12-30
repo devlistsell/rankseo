@@ -3509,8 +3509,6 @@
   'keywords_listing' => 'Keyword Listing',
   'keywords' => 'Keywords',
   'keyword_histories' => 'Keyword Histories',
-  'keywords_listing'=> 'Keyword Listing',
-  'keyword_ranking' => 'Ranking',
   'difficulty'=>'Difficulty',
   'keyword'=>'Keyword',
   'ranking'=>'Ranking',
@@ -3518,4 +3516,6 @@
   'filter_by_date'=>'Date Filter',
   'filter'=>'Filter',
   'clear_filter'=>'Clear Filter',
+  'date'=>'Date',
+  'time'=>'Time',
 ) ?>

@@ -602,7 +602,6 @@ class CustomerController extends Controller
     {
         // Get current user
         $customer = \Acelle\Model\Customer::findByUid($uid);
-
         // authorize
         if (\Gate::denies('update', $customer)) {
             return $this->notAuthorized();

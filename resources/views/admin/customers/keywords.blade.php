@@ -185,7 +185,8 @@
                     },
                     error: function(xhr, status, error) {
                         // Handle error
-                        console.error("Error:", error);
+                        $('.search_btn').html('Search');
+                        $(".search_btn").removeClass('loading button-loading');
                     }
                 });
             });

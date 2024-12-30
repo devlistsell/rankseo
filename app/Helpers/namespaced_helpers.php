@@ -18,9 +18,10 @@ use Google\Service\SearchConsole\SearchAnalyticsQueryRequest;
 use Google\Service\SearchConsole\ApiDimensionFilter;
 use Google\Service\SearchConsole\ApiDimensionFilterGroup;
 
-function keywordSearch($data, $clientDetail)
+
+
+function keywordSearch(array $keywords, $website)
 {
-    $keyword = $data['keyword'];
     $client = new Client();
     $client->setApplicationName('RankSeo');
     $client->setAuthConfig(storage_path('app/google_service_account.json')); // Path to your service account credentials
@@ -30,46 +31,243 @@ function keywordSearch($data, $clientDetail)
     $searchConsole = new SearchConsole($client);
 
     // Set the site URL
-    $siteUrl = $clientDetail->website;
+    $siteUrl = $website;
 
     // Set the date range for the query
     $startDate = now()->subDays(3)->toDateString(); // Last 3 days
     $endDate = now()->toDateString(); // Current date
 
-    // Set the request body parameters
-    $requestBody = new SearchAnalyticsQueryRequest();
-    $requestBody->setStartDate($startDate);
-    $requestBody->setEndDate($endDate);
-    $requestBody->setDimensions(['query']);  // Query dimension (keywords)
-    $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+    $results = [];
 
-    // Define the filter for a single keyword
-    $filter = new ApiDimensionFilter([
-        'dimension' => 'query',
-        'operator' => 'equals',
-        'expression' => $keyword // Replace with the single keyword
-    ]);
+    foreach ($keywords as $keyword) {
+        // Set the request body parameters
+        $requestBody = new SearchAnalyticsQueryRequest();
+        $requestBody->setStartDate($startDate);
+        $requestBody->setEndDate($endDate);
+        $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+        $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
 
-    // Group the filter into a filter group
-    $filterGroup = new ApiDimensionFilterGroup([
-        'filters' => [$filter]
-    ]);
+        // Create a filter for the current keyword
+        $filter = new ApiDimensionFilter([
+            'dimension' => 'query',
+            'operator' => 'equals',
+            'expression' => $keyword
+        ]);
 
-    // Add the filter group to the request body
-    $requestBody->setDimensionFilterGroups([$filterGroup]);
+        // Add the filter to a DimensionFilterGroup
+        $filterGroup = new ApiDimensionFilterGroup([
+            'filters' => [$filter]
+        ]);
 
-    // Make the request to the Google API
-    $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+        // Add the filter group to the request body
+        $requestBody->setDimensionFilterGroups([$filterGroup]);
 
-    // Handle the response
-    $rankings = $response->getRows();
-    
-    if ($rankings) {
-        return $rankings;
-    }else{
-        return [];
+        // Make the request to the Google API
+        $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+        // Initialize result for the current keyword
+        $found = false;
+        $position = null;
+
+        // Check if there are any rows in the response
+        $rankings = $response->getRows();
+
+        if (!empty($rankings)) {
+            $found = true;
+
+            // Extract the position from the first row (assuming sorted by relevance)
+            foreach ($rankings as $row) {
+                $position = $row->getPosition(); // Adjust based on API response structure
+                break;
+            }
+        }
+
+        // Add the result to the array
+        $results[] = [
+            'keyword' => $keyword,
+            'found' => $found,
+            'position' => $position
+        ];
     }
+
+    return $results;
 }
+
+// function keywordSearch(array $keywords, $website)
+// {
+//     $client = new Client();
+//     $client->setApplicationName('RankSeo');
+//     $client->setAuthConfig(storage_path('app/google_service_account.json')); // Path to your service account credentials
+//     $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+//     // Create a SearchConsole service instance
+//     $searchConsole = new SearchConsole($client);
+
+//     // Set the site URL
+//     $siteUrl = $website;
+
+//     // Set the date range for the query
+//     $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+//     $endDate = now()->toDateString(); // Current date
+
+//     $results = [];
+
+//     foreach ($keywords as $keyword) {
+//         // Set the request body parameters
+//         $requestBody = new SearchAnalyticsQueryRequest();
+//         $requestBody->setStartDate($startDate);
+//         $requestBody->setEndDate($endDate);
+//         $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+//         $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+//         // Create a filter for the current keyword
+//         $filter = new ApiDimensionFilter([
+//             'dimension' => 'query',
+//             'operator' => 'equals',
+//             'expression' => $keyword
+//         ]);
+
+//         // Add the filter to a DimensionFilterGroup
+//         $filterGroup = new ApiDimensionFilterGroup([
+//             'filters' => [$filter]
+//         ]);
+
+//         // Add the filter group to the request body
+//         $requestBody->setDimensionFilterGroups([$filterGroup]);
+
+//         // Make the request to the Google API
+//         $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+//         // Initialize result for the current keyword
+//         $result = [
+//             'found' => false,
+//             'position' => null
+//         ];
+
+//         // Check if there are any rows in the response
+//         $rankings = $response->getRows();
+
+//         if (!empty($rankings)) {
+//             $result['found'] = true;
+
+//             // Extract the position from the first row (assuming sorted by relevance)
+//             foreach ($rankings as $row) {
+//                 $result['position'] = $row->getPosition(); // Adjust based on API response structure
+//                 break;
+//             }
+//         }
+
+//         // Store the result for the keyword
+//         $results[$keyword] = $result;
+//     }
+
+//     return $results;
+// }
+
+
+// function keywordSearch(array $keywords, $website)
+// {
+//     $client = new Client();
+//     $client->setApplicationName('RankSeo');
+//     $client->setAuthConfig(storage_path('app/google_service_account.json')); // Path to your service account credentials
+//     $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+//     // Create a SearchConsole service instance
+//     $searchConsole = new SearchConsole($client);
+
+//     // Set the site URL
+//     $siteUrl = $website;
+
+//     // Set the date range for the query
+//     $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+//     $endDate = now()->toDateString(); // Current date
+
+//     // Set the request body parameters
+//     $requestBody = new SearchAnalyticsQueryRequest();
+//     $requestBody->setStartDate($startDate);
+//     $requestBody->setEndDate($endDate);
+//     $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+//     $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+//     // Create a DimensionFilterGroup for each keyword
+//     $dimensionFilterGroups = [];
+//     foreach ($keywords as $keyword) {
+//         $filter = new ApiDimensionFilter([
+//             'dimension' => 'query',
+//             'operator' => 'equals',
+//             'expression' => $keyword
+//         ]);
+
+//         $dimensionFilterGroups[] = new ApiDimensionFilterGroup([
+//             'filters' => [$filter] // Each group has one filter
+//         ]);
+//     }
+
+//     // Add the filter groups to the request body
+//     $requestBody->setDimensionFilterGroups($dimensionFilterGroups);
+
+//     // Make the request to the Google API
+//     $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+//     // Handle the response
+//     $rankings = $response->getRows();
+
+//     return $rankings ?: [];
+// }
+
+
+// function keywordSearch($keyword, $website)
+// {
+//     $keyword = $keyword;
+//     $client = new Client();
+//     $client->setApplicationName('RankSeo');
+//     $client->setAuthConfig(storage_path('app/google_service_account.json')); // Path to your service account credentials
+//     $client->setScopes([SearchConsole::WEBMASTERS_READONLY]);
+
+//     // Create a SearchConsole service instance
+//     $searchConsole = new SearchConsole($client);
+
+//     // Set the site URL
+//     $siteUrl = $website;
+
+//     // Set the date range for the query
+//     $startDate = now()->subDays(3)->toDateString(); // Last 3 days
+//     $endDate = now()->toDateString(); // Current date
+
+//     // Set the request body parameters
+//     $requestBody = new SearchAnalyticsQueryRequest();
+//     $requestBody->setStartDate($startDate);
+//     $requestBody->setEndDate($endDate);
+//     $requestBody->setDimensions(['query']);  // Query dimension (keywords)
+//     $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+
+//     // Define the filter for a single keyword
+//     $filter = new ApiDimensionFilter([
+//         'dimension' => 'query',
+//         'operator' => 'equals',
+//         'expression' => $keyword // Replace with the single keyword
+//     ]);
+
+//     // Group the filter into a filter group
+//     $filterGroup = new ApiDimensionFilterGroup([
+//         'filters' => [$filter]
+//     ]);
+
+//     // Add the filter group to the request body
+//     $requestBody->setDimensionFilterGroups([$filterGroup]);
+
+//     // Make the request to the Google API
+//     $response = $searchConsole->searchanalytics->query($siteUrl, $requestBody);
+
+//     // Handle the response
+//     $rankings = $response->getRows();
+    
+//     if ($rankings) {
+//         return $rankings;
+//     }else{
+//         return [];
+//     }
+// }
 function generatePublicPath($absPath, $withHost = false)
 {
     // Notice: $relativePath must be relative to storage/ folder

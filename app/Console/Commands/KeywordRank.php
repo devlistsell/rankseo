@@ -48,7 +48,7 @@ class KeywordRank extends Command
         foreach($clients as $key=>$client){
             $allKey = \Acelle\Model\keyword::where('uid', $client->id)->pluck('keyword')->toArray();
             if($allKey){
-                $rankings = \Acelle\Helpers\keywordSearch($allKey, 'https://sa-kat.de');
+                $rankings = \Acelle\Helpers\keywordSearch($allKey, $client['website']);
                 $totalRanks = [];
                 foreach ($rankings as $val) {
                     if ($val['found']) {
@@ -57,7 +57,7 @@ class KeywordRank extends Command
                             $totalRanks[] = [
                                 'uid' => $client['id'],
                                 'keyword_id' => $keyId,
-                                'ranking' => $val['position'],
+                                'ranking' => round($val['position'], 2),
                                 'date_time' => now(),
                             ];
                         }

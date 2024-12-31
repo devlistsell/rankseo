@@ -37,7 +37,7 @@ class Kernel extends ConsoleKernel
         if (!isInitiated()) {
             return;
         }
-
+        $schedule->command('keywordsearch:run')->twiceDaily(10, 22);
         // Make sure CLI process is NOT executed as root
         Notification::recordIfFails(function () {
             if (!exec_enabled()) {

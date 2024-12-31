@@ -869,4 +869,48 @@ class CustomerController extends Controller
     //     // dd($rankings);
     //     // return view('keyword-rankings', compact('rankings'));
     // }
+
+    public function invoices(Request $request, $uid)
+    {
+        // Get current user
+        $customer = \Acelle\Model\Customer::findByUid($uid);
+        // authorize
+        if (\Gate::denies('update', $customer)) {
+            return $this->notAuthorized();
+        }
+
+        if ($customer->contact) {
+            $contact = $customer->contact;
+        } else {
+            $contact = new \Acelle\Model\Contact([
+                'first_name' => $customer->user->first_name,
+                'last_name' => $customer->user->last_name,
+                'email' => $customer->user->email,
+            ]);
+        }
+
+        // Create new company if null
+        if (!$contact) {
+            $contact = new \Acelle\Model\Contact();
+        }
+
+        // save posted data
+        if ($request->isMethod('post')) {
+            $this->validate($request, \Acelle\Model\Contact::$rules);
+
+            $contact->fill($request->all());
+
+            // Save current user info
+            if ($contact->save()) {
+                $customer->contact_id = $contact->id;
+                $customer->save();
+                $request->session()->flash('alert-success', trans('messages.customer_contact.updated'));
+            }
+        }
+
+        return view('admin.customers.invoices', [
+            'customer' => $customer,
+            'contact' => $contact->fill($request->old()),
+        ]);
+    }
 }

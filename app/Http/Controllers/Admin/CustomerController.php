@@ -646,30 +646,6 @@ class CustomerController extends Controller
 
     public function search_keywords(Request $request)
     {
-        $clients = \Acelle\Model\User::select('id','website')->where('id','!=',1)->where('website','!=','')->get();
-        foreach($clients as $key=>$client){
-            $allKey = \Acelle\Model\keyword::where('uid', $client->id)->pluck('keyword')->toArray();
-            if($allKey){dd($allKey);
-                $rankings = \Acelle\Helpers\keywordSearch($allKey, 'https://sa-kat.de');
-                $totalRanks = [];
-                foreach ($rankings as $val) {
-                    if ($val['found']) {
-                        $keyId = \Acelle\Model\keyword::where('keyword', $val['keyword'])->first()->id;
-                        if(isset($keyId)){
-                            $totalRanks[] = [
-                                'uid' => $client['id'],
-                                'keyword_id' => $keyId,
-                                'ranking' => $val['position'],
-                                'date_time' => now(),
-                            ];
-                        }
-                    }
-                }
-                \Acelle\Model\KeywordHistory::insert($totalRanks);
-            }
-        }
-
-        dd('yesss');
         $clientId = $request->client_id;
         $keyword = $request->keyword; // Single keyword to filter
         if (empty($keyword) || empty($clientId)) {

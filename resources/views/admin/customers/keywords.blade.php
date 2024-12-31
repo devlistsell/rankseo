@@ -2,7 +2,7 @@
     'menu' => 'customer',
 ])
 
-@section('title', trans('messages.contact_information'))
+@section('title', trans('messages.keyword'))
 
 @section('page_header')
 

@@ -46,23 +46,32 @@ class Keyword extends Model
         return Carbon::parse($this->date_time)->timezone('Asia/Kolkata')->format('H:i:s');
     }
 
-    public static function search($request)
+    public function rank()
     {
-        $query = self::filter($request);
-        $query = $query->orderBy($request->sort_order, $request->sort_direction);
-        return $query;
+        return $this->hasOne(Rank::class, 'id', 'ranking');
     }
 
-    public function scopeFilter(Builder $query, $filters)
+    public function rankDifficulty()
     {
-        if (!empty($filters['type'])) {
-            $query->where('type', $filters['type']);
-        }
-
-        if (!empty($filters['keyword'])) {
-            $query->where('message', 'like', '%' . $filters['keyword'] . '%');
-        }
-
-        return $query;
+        return $this->hasOneThrough(
+            RankDifficulty::class,
+            Rank::class,
+            'id',
+            'rank_id',
+            'ranking',
+            'id'
+        );
     }
+
+    public function scopeLast7Days($query)
+    {
+        return $query->where('date_time', '>=', now()->subDays(7));
+    }
+
+    public function calculatePrice()
+    {
+        $rankDifficulty = $this->rankDifficulty;
+        return $rankDifficulty ? $rankDifficulty->price : 0;
+    }
+
 }

@@ -1190,8 +1190,9 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['not_installed', 'auth', 
     Route::post('admin/customers/search/keywords', 'CustomerController@search_keywords')->name('admin.searchkeyword');
     Route::post('admin/customers/save/keywords', 'CustomerController@save_keywords')->name('admin.savekeyword');
     Route::get('admin/customers/{id}/invoices', 'CustomerController@invoices');
+    Route::post('admin/customers/refresh/keywords', 'CustomerController@refresh_keywords')->name('admin.refreshkeyword');
 
-
+    
     // Admin Group
     Route::get('admin/admin_groups/listing/{page?}', 'AdminGroupController@listing');
     Route::get('admin/admin_groups/sort', 'AdminGroupController@sort');

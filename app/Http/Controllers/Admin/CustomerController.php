@@ -7,6 +7,7 @@ use Acelle\Http\Controllers\Controller;
 use Acelle\Model\PlanGeneral;
 use Acelle\Library\Facades\Hook;
 use Acelle\Model\Keyword;
+use Acelle\Model\KeywordHistory;
 use Google\Client;
 use Google\Service\SearchConsole;
 use Google\Service\SearchConsole\SearchAnalyticsQueryRequest;
@@ -813,6 +814,42 @@ class CustomerController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'message' => 'Failed to add keyword!']);
         }
+    }
+
+    public function refresh_keywords(Request $request)
+    {
+        $clientId = $request->client_id;
+        $clientDetail = \Acelle\Model\User::where('id', $clientId)->first();
+        if (!$clientDetail || empty($clientDetail->website)) {
+            $request->session()->flash('alert-warning', 'Client website is required!');
+            return response()->json(['status' => 'site']);
+        }
+
+        $allKey = \Acelle\Model\keyword::where('uid', $clientId)->pluck('keyword')->toArray();
+        if($allKey){
+            $rankings = \Acelle\Helpers\keywordSearch($allKey, $clientDetail->website);
+            $totalRanks = [];
+            foreach ($rankings as $val) {
+                if ($val['found']) {
+                    $keyId = \Acelle\Model\keyword::select('id')->where('keyword', $val['keyword'])->first();
+                    if(isset($keyId->id) && !empty($keyId->id)){
+                        $rank = round($val['position'], 2);
+                        $totalRanks[] = [
+                            'uid' => $clientId,
+                            'keyword_id' => $keyId->id,
+                            'ranking' => $rank,
+                            'date_time' => now(),
+                        ];
+                        Keyword::where('id',$keyId->id)->update(['ranking'=>$rank]);
+                    }
+                }
+            }
+            if(count($totalRanks)){
+                KeywordHistory::insert($totalRanks);
+            }
+        }
+        $request->session()->flash('alert-success', 'Successfully');
+        return response()->json(['status' => true]);
     }
 
     // public function search_keywords(Request $request)

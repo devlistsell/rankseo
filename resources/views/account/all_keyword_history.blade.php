@@ -20,9 +20,15 @@
             <li class="breadcrumb-item"><a href="{{ action("HomeController@index") }}">{{ trans('messages.home') }}</a></li>
             <li class="breadcrumb-item active">{{ trans('messages.keyword_history') }}</li>
         </ul>
-        <h1>
-            <span class="text-semibold"><i class="icon-keywords"></i> {{ trans('messages.keyword_history') }}</span>
+         <h1>
+            <span class="text-semibold">
+                <i class="icon-keywords"></i> 
+                {{ $keywordName ? 'Keyword ' . $keywordName : trans('messages.keyword') }}
+            </span>
         </h1>
+        <a href="{{ route('keywords.listing') }}" class="btn btn-secondary mb-3">
+            <i class="fa fa-arrow-left"></i> Back to Keywords
+        </a>
     </div>
 @endsection
 
@@ -30,10 +36,13 @@
     <div class="d-flex top-list-controls top-sticky-content">
         <div class="me-auto">
             <div class="filter-box">
-                <!-- Add date range filter -->
                 <span class="filter-group">
                     <span class="title text-semibold text-muted">{{ trans('messages.filter_by_date') }}:</span>
                     <input type="text" name="daterange" value="" class="form-control" />
+                </span>
+                <span class="filter-group">
+                    <span class="title text-semibold text-muted">{{ trans('messages.filter_by_ranking') }}:</span>
+                    <input type="text" id="ranking-search" class="form-control" placeholder="{{ trans('messages.enter_ranking') }}" />
                 </span>
                 <button type="button" id="filter-btn" class="btn btn-primary">{{ trans('messages.filter') }}</button>
                 <button type="button" id="clear-btn" class="btn btn-secondary">{{ trans('messages.clear_filter') }}</button>
@@ -45,7 +54,7 @@
         <table id="keywords-table" class="table table-bordered table-striped mt-2">
             <thead>
                 <tr>
-                    <th>{{ trans('messages.keyword') }}</th>
+                    <!-- <th>{{ trans('messages.keyword') }}</th> -->
                     <th>{{ trans('messages.ranking') }}</th>
                     <th>{{ trans('messages.date') }}</th>
                     <th>{{ trans('messages.time') }}</th>
@@ -79,7 +88,7 @@
                 url: '{{ route('allKeywordsHistory') }}',
                 data: function(d) {
                     var daterange = $('input[name="daterange"]').data('daterangepicker');
-                    
+
                     if (daterange && daterange.startDate && daterange.endDate) {
                         d.from_date = daterange.startDate.format('YYYY-MM-DD');
                         d.to_date = daterange.endDate.format('YYYY-MM-DD');
@@ -87,16 +96,21 @@
                         d.from_date = '';
                         d.to_date = '';
                     }
+
+                    d.keyword_name = '{{ request('keyword_name') }}';
+
+                    d.ranking_search = $('#ranking-search').val(); 
                 }
             },
             columns: [
-                { data: 'keyword', name: 'keyword' },
                 { data: 'ranking', name: 'ranking' },
                 { data: 'date', name: 'date' },
                 { data: 'time', name: 'time' },
             ],
-            
-            searching: true
+            searching: false,
+            language: {
+                emptyTable: "{{ trans('messages.no_data_found') }}",
+            },
         });
 
         $('#filter-btn').click(function() {

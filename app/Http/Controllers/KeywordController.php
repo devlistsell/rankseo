@@ -104,7 +104,8 @@ class KeywordController extends Controller
 
             if ($request->ajax()) {
                 $history = KeywordHistory::with('keyword')
-                    ->whereIn('keyword_id', $user->keywords()->pluck('id'));
+                    ->whereIn('keyword_id', $user->keywords()->pluck('id'))
+                    ->orderBy('date_time', 'desc');
 
             if ($request->filled('keyword_name')) {
                 $keywordName = $request->keyword_name;

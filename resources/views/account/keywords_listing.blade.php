@@ -9,7 +9,7 @@
     <link href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">    
 @endsection
 
 @section('page_header')
@@ -34,6 +34,7 @@
                     <th>{{ trans('messages.difficulty') }}</th>
                     <th>{{ trans('messages.date') }}</th>
                     <th>{{ trans('messages.time') }}</th>
+                    <th>{{ trans('messages.action') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,14 +53,16 @@
                 type: 'GET',
             },
             columns: [
-                { data: 'keyword', name: 'keyword' },
-                { data: 'ranking', name: 'ranking' },
-                { data: 'difficulty', name: 'difficulty' },
-                { data: 'date', name: 'date', orderable: false, searchable: false },
-                { data: 'time', name: 'time', orderable: false, searchable: false },
-            ],
+    { data: 'keyword', name: 'keyword' },
+    { data: 'ranking', name: 'ranking' },
+    { data: 'difficulty', name: 'difficulty' },
+    { data: 'date', name: 'date_time' }, // Update 'date' to 'date_time'
+    { data: 'time', name: 'date_time' }, // Update 'time' to 'date_time'
+    { data: 'action', name: 'action', orderable: false, searchable: false },
+],
             searching: true,
         });
     });
 </script>
+
 @endsection

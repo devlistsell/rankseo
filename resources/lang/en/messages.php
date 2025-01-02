@@ -3518,4 +3518,8 @@
   'clear_filter'=>'Clear Filter',
   'date'=>'Date',
   'time'=>'Time',
+  'filter_by_ranking'=>'Filter Ranking',
+  'enter_ranking'=>'Enter Ranking',
+  'no_data_found'=>'No Data Found',
+  
 ) ?>

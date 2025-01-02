@@ -3515,4 +3515,7 @@
   'clear_filter'=>'Filter löschen',
   'date'=>'Datum',
   'time'=>'Zeit',
+  'filter_by_ranking'=>'Ranking filtern',
+  'enter_ranking'=>'Ranking eingeben',
+  'no_data_found'=>'Keine Daten gefunden',
 ) ?>

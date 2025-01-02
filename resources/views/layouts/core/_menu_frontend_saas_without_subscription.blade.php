@@ -45,16 +45,6 @@
                     </a>
                 </li>
 
-                <!-- Keyword History Menu Item -->
-                <li class="nav-item {{ $menu == 'keyword_history' ? 'active' : '' }}">
-                    <a title="{{ trans('messages.keyword_history') }}" href="{{ url('account/keywords/history') }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
-                        <i class="navbar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M7,12.3a1.8,1.8,0,0,1-.9-.4,1.4,1.4,0,0,1-.3-.9,1.6,1.6,0,0,1,.3-.9L7,9.8a1.4,1.4,0,0,1,.9.3,1.8,1.8,0,0,1,.4.9A1.4,1.4,0,0,1,7,12.3Zm6,0a1.8,1.8,0,0,1-.9-.4,1.4,1.4,0,0,1-.3-.9,1.6,1.6,0,0,1,.3-.9l.9-.3a1.4,1.4,0,0,1,.9.3,1.8,1.8,0,0,1,.4.9A1.4,1.4,0,0,1,13,12.3ZM10,18a8.1,8.1,0,0,0,5.7-2.3A8.1,8.1,0,0,0,18,10a4.9,4.9,0,0,0-.1-1.2,3.6,3.6,0,0,0-.2-1H15.5a9.4,9.4,0,0,1-4.3-1A8.9,8.9,0,0,1,7.8,4.3,11.3,11.3,0,0,1,5.5,7.7,11.5,11.5,0,0,1,2,9.9H2a8.1,8.1,0,0,0,2.3,5.7A8.1,8.1,0,0,0,10,18Zm0,2a10.1,10.1,0,0,1-3.9-.8,9.9,9.9,0,0,1-3.2-2.1A9.9,9.9,0,0,1,.8,13.9a9.9,9.9,0,0,1,0-7.8A9.9,9.9,0,0,1,2.9,2.9,9.9,9.9,0,0,1,6.1.8a9.9,9.9,0,0,1,7.8,0,9.9,9.9,0,0,1,3.2,2.1,9.9,9.9,0,0,1,2.1,3.2,9.9,9.9,0,0,1,0,7.8,9.9,9.9,0,0,1-2.1,3.2,9.9,9.9,0,0,1-3.2,2.1A10.1,10.1,0,0,1,10,20ZM8.7,2.1a7.5,7.5,0,0,0,2.8,2.8,7.7,7.7,0,0,0,4,1.1h1.4A7.8,7.8,0,0,0,14,3.1,7.7,7.7,0,0,0,10,2H8.7ZM2.4,7.5A8.3,8.3,0,0,0,4.7,5.6,8.2,8.2,0,0,0,6.1,3,6.7,6.7,0,0,0,3.9,4.9,6.8,6.8,0,0,0,2.4,7.5Z" style="fill:#f2f2f2"/></g></g></svg>
-                        </i>
-                        <span>{{ trans('messages.keyword_history') }}</span>
-                    </a>
-                </li>
-                
                 <li class="nav-item {{ $menu == 'contact' ? 'active' : '' }}">
                     <a title="{{ trans('messages.contact_information') }}" href="{{ action("AccountController@contact") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
                         <i class="navbar-icon">

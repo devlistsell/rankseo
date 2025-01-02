@@ -52,14 +52,16 @@ class KeywordRank extends Command
                 $totalRanks = [];
                 foreach ($rankings as $val) {
                     if ($val['found']) {
-                        $keyId = \Acelle\Model\keyword::where('keyword', $val['keyword'])->first()->id;
-                        if(isset($keyId)){
+                        $keyId = \Acelle\Model\keyword::select('id')->where('keyword', $val['keyword'])->first();
+                        if(isset($keyId->id) && !empty($keyId->id)){
+                            $rank = round($val['position'], 2);
                             $totalRanks[] = [
                                 'uid' => $client['id'],
-                                'keyword_id' => $keyId,
-                                'ranking' => round($val['position'], 2),
+                                'keyword_id' => $keyId->id,
+                                'ranking' => $rank,
                                 'date_time' => now(),
                             ];
+                            \Acelle\Model\Keyword::where('id',$keyId->id)->update(['ranking'=>$rank,'date_time'=>date('Y-m-d H:i:s')]);
                         }
                     }
                 }

@@ -1197,6 +1197,7 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['not_installed', 'auth', 
     // Invoice Management
     Route::get('admin/invoices_listing', 'InvoiceController@invoicesListing')->name('invoices.listing');
 
+    Route::post('admin/customers/create/invoice', 'CustomerController@create_invoice')->name('admin.create_invoice');
     
     // Admin Group
     Route::get('admin/admin_groups/listing/{page?}', 'AdminGroupController@listing');

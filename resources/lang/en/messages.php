@@ -3521,5 +3521,12 @@
   'filter_by_ranking'=>'Filter Ranking',
   'enter_ranking'=>'Enter Ranking',
   'no_data_found'=>'No Data Found',
-  
+  'invoices_listing'=>'Invoices Listing',
+  'customer_name'=>'Client Name',
+  'invoice_number'=>'Invoice Number',
+  'generate_date'=>'Generate Date',
+  'grand_total'=>'Grand Total',
+  'payment_status'=>'Payment Status',
+  'assign_status'=>'Assign Status',
+  'invoices'=>'Invoices'
 ) ?>

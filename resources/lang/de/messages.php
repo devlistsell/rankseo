@@ -3518,4 +3518,12 @@
   'filter_by_ranking'=>'Ranking filtern',
   'enter_ranking'=>'Ranking eingeben',
   'no_data_found'=>'Keine Daten gefunden',
+  'invoices_listing'=>'Auflistung der Rechnungen',
+  'customer_name'=>'Name des Kunden',
+  'invoice_number'=>'Name des Kunden',
+  'generate_date'=>'Name des Kunden',
+  'grand_total'=>'Gesamtsumme',
+  'payment_status'=>'Status der Zahlung',
+  'assign_status'=>'Status der Zahlung',
+  'invoices'=>'Rechnungen',
 ) ?>

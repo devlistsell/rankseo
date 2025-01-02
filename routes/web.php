@@ -12,6 +12,7 @@
 */
 use Acelle\Http\Controllers\KeywordController;
 //use App\Http\Controllers\AccountController;
+//use Acelle\Http\Controllers\Admin\NewpController;
 
 // Installation
 Route::group(['middleware' => ['installed']], function () {
@@ -899,6 +900,8 @@ Route::group(['middleware' => ['auth', 'frontend', 'subscription', '2fa']], func
     Route::get('invoices/{invoice_uid}/logs', 'InvoiceController@logs');
     Route::delete('invoices/{invoice_uid}/delete', 'InvoiceController@delete');
 
+    
+
     // Chat
     Route::post('chat', 'ChatController@chat');
 
@@ -1191,6 +1194,8 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['not_installed', 'auth', 
     Route::post('admin/customers/save/keywords', 'CustomerController@save_keywords')->name('admin.savekeyword');
     Route::get('admin/customers/{id}/invoices', 'CustomerController@invoices');
     Route::post('admin/customers/refresh/keywords', 'CustomerController@refresh_keywords')->name('admin.refreshkeyword');
+    // Invoice Management
+    Route::get('admin/invoices_listing', 'InvoiceController@invoicesListing')->name('invoices.listing');
 
     Route::post('admin/customers/create/invoice', 'CustomerController@create_invoice')->name('admin.create_invoice');
     

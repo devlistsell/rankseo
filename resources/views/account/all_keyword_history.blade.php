@@ -20,10 +20,10 @@
             <li class="breadcrumb-item"><a href="{{ action("HomeController@index") }}">{{ trans('messages.home') }}</a></li>
             <li class="breadcrumb-item active">{{ trans('messages.keyword_history') }}</li>
         </ul>
-         <h1>
+        <h1>
             <span class="text-semibold">
                 <i class="icon-keywords"></i> 
-                {{ $keywordName ? 'Keyword ' . $keywordName : trans('messages.keyword') }}
+                {{ $keywordName ?? trans('messages.keyword') }}
             </span>
         </h1>
         <a href="{{ route('keywords.listing') }}" class="btn btn-secondary mb-3">

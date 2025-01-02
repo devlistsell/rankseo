@@ -2,7 +2,7 @@
     'menu' => 'customer',
 ])
 
-@section('title', trans('messages.contact_information'))
+@section('title', trans('messages.keyword'))
 
 @section('page_header')
 
@@ -25,9 +25,16 @@
 @section('content')
 
     @include('admin.customers._tabs')
-
-    <h3 class="text-semibold text-primary">Keyword Management</h3>
-
+    <div class="d-flex top-list-controls top-sticky-content">
+        <div class="me-auto">
+                <h3 class="text-semibold text-primary">Keyword Management</h3>
+        </div>
+        <div class="text-end">
+            <button role="button" class="btn btn-info refresh_btn">
+                <span class="material-symbols-rounded">refresh</span> Refresh Keywords
+            </button>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-4">
             <div class="row">
@@ -57,8 +64,8 @@
                 <div class="col-md-10 search-related hide">
                     <div class="form-group control-select">
                         <label> Difficulty <span class="text-danger">*</span> </label>
-                        <select name="difficulty" id="difficulty" class="select select2-hidden-accessible" tabindex="-1"
-                            aria-hidden="true">
+                        <select name="difficulty" id="difficulty" class="select select2-hidden-accessible"
+                            tabindex="-1" aria-hidden="true">
                             <option value="">Choose</option>
                             <option value="1">0-49</option>
                             <option value="2">50-69</option>
@@ -95,6 +102,7 @@
                         <th scope="col">Keyword</th>
                         <th scope="col">Rank</th>
                         <th scope="col">Difficulty</th>
+                        <th scope="col">DateTime</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,6 +122,8 @@
                                     @else
                                         --
                                     @endif
+                                </td>
+                                <td>{{ date('d-m-Y', strtotime($val->date_time)) }},{{ date('H:i:s', strtotime($val->date_time)) }}
                                 </td>
                             </tr>
                         @endforeach
@@ -170,16 +180,16 @@
                             $('#success-message').text(response.message).show();
                             $('#rank').val(response.position);
                             $(".search-related").removeClass('hide');
-                        }else if (response.status == 'exist') {
+                        } else if (response.status == 'exist') {
                             $('.keyword_exist_error').removeClass('hide');
                             return false;
-                        }else if (response.status == 'site') {
+                        } else if (response.status == 'site') {
                             $("#error-message").text(response.message).show();
                             return false;
-                        }else if(response.status == 'empty'){
+                        } else if (response.status == 'empty') {
                             $('.keyword_error').removeClass('hide');
                             return false;
-                        }else{
+                        } else {
                             $("#error-message").text(response.message).show();
                         }
                     },
@@ -240,7 +250,37 @@
                     }
                 });
             });
+
+            //Keyword Search Section
+            $(".refresh_btn").click(function() {
+                $(this).html('Please Wait');
+                $(this).addClass('loading');
+                addButtonLoadingEffect($(this));
+                $.ajax({
+                    url: "{{ route('admin.refreshkeyword') }}",
+                    type: "POST",
+                    data: {
+                        client_id: "{{ $customer->id }}",
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        $('.search_btn').html('Refresh Keywords');
+                        $(".search_btn").removeClass('loading button-loading');
+                        if (response.status == true) {
+                            location.reload();
+                        } else if (response.status == 'site') {
+                            location.reload();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error
+                        $('.search_btn').html('Search');
+                        $(".search_btn").removeClass('loading button-loading');
+                    }
+                });
+            });
         });
+
         function addButtonLoadingEffect(button) {
             button.addClass('button-loading');
             button.append('<div class="loader"></div>');

@@ -45,7 +45,7 @@ function keywordSearch(array $keywords, $website)
         $requestBody->setStartDate($startDate);
         $requestBody->setEndDate($endDate);
         $requestBody->setDimensions(['query']);  // Query dimension (keywords)
-        $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+        $requestBody->setRowLimit(100);  // Limit the response to the top 10 rows
 
         // Create a filter for the current keyword
         $filter = new ApiDimensionFilter([

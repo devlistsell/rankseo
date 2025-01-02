@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Acelle\Http\Controllers\Controller;
 use Acelle\Model\PlanGeneral;
 use Acelle\Library\Facades\Hook;
+use Acelle\Model\InvoiceClient;
 use Acelle\Model\Keyword;
 use Acelle\Model\KeywordHistory;
 use Google\Client;
@@ -681,7 +682,7 @@ class CustomerController extends Controller
             $requestBody->setStartDate($startDate);
             $requestBody->setEndDate($endDate);
             $requestBody->setDimensions(['query']);  // Query dimension (keywords)
-            $requestBody->setRowLimit(10);  // Limit the response to the top 10 rows
+            $requestBody->setRowLimit(100);  // Limit the response to the top 10 rows
 
             // Define the filter for a single keyword
             $filter = new ApiDimensionFilter([
@@ -840,7 +841,7 @@ class CustomerController extends Controller
                             'ranking' => $rank,
                             'date_time' => now(),
                         ];
-                        Keyword::where('id',$keyId->id)->update(['ranking'=>$rank]);
+                        Keyword::where('id',$keyId->id)->update(['ranking'=>$rank,'date_time'=>date('Y-m-d H:i:s')]);
                     }
                 }
             }
@@ -944,10 +945,17 @@ class CustomerController extends Controller
                 $request->session()->flash('alert-success', trans('messages.customer_contact.updated'));
             }
         }
-
-        return view('admin.customers.invoices', [
+        $invoices = InvoiceClient::latest()->paginate(10);
+        return view('admin.customers.invoice.invoices', [
+            'invoices' => $invoices,
             'customer' => $customer,
             'contact' => $contact->fill($request->old()),
         ]);
     }
+    
+    public function create_invoice(Request $request)
+    {
+dd(123);
+    }
+
 }

@@ -123,7 +123,7 @@
                                         --
                                     @endif
                                 </td>
-                                <td>{{ date('d-m-Y', strtotime($val->date_time)) }},{{ date('H:i:s', strtotime($val->date_time)) }}
+                                <td>{{ date('d.m.Y', strtotime($val->date_time)) }},{{ date('H:i:s', strtotime($val->date_time)) }}
                                 </td>
                             </tr>
                         @endforeach

@@ -7,8 +7,9 @@ use Acelle\Http\Controllers\Controller;
 use Acelle\Model\Invoice;
 use Acelle\Model\Transaction;
 use Acelle\Model\Customer;
-use Acelle\Model\NewInvoice; // Correct model namespace
+use Acelle\Model\NewInvoice;
 use Yajra\DataTables\DataTables;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -274,75 +275,64 @@ class InvoiceController extends Controller
                     $invoices = $invoices->orderBy($columns[$orderColumnIndex], $orderDirection);
                 }
             }
-
+            
             return DataTables::of($invoices)
-                ->addIndexColumn()
-                ->editColumn('uid', function ($row) {
-                    return $row->first_name && $row->last_name ? "{$row->first_name} {$row->last_name}" : 'Unknown User';
-                })
-                ->editColumn('date_time', function ($row) {
-                    return date('Y-m-d', strtotime($row->date_time));
-                })
-                ->editColumn('grand_total', function ($row) {
-                    return number_format($row->grand_total, 2);
-                })
-                ->editColumn('payment_status', function ($row) {
-                    return $row->payment_status == 1 ? 'Paid' : 'Pending';
-                })
-                ->editColumn('status', function ($row) {
-                    return $row->status == 1 ? 'Assigned' : 'Not Assigned';
-                })
-                // ->addColumn('action', function ($row) {
-                //     return '<a href="#" class="btn btn-primary btn-sm"><i class="fas fa-eye" title="View Details"></i></a>';
-                // })
-                ->addColumn('action', function ($row) {
-                    return '<button class="btn btn-primary btn-sm assign-btn" 
-                                    data-id="' . $row->id . '" 
-                                    data-name="' . $row->first_name . ' ' . $row->last_name . '">
-                                <i class="fas fa-user-plus"></i> Assign Invoice
-                            </button>';
-                    })
-                    ->rawColumns(['action'])
-                ->rawColumns(['action'])
-                ->make(true);
+            ->addIndexColumn()
+            ->editColumn('uid', function ($row) {
+                return $row->first_name && $row->last_name ? "{$row->first_name} {$row->last_name}" : 'Unknown User';
+            })
+            ->editColumn('date_time', function ($row) {
+                return $row->formatDate() . ' ' . $row->formatTime();
+            })
+            ->editColumn('grand_total', function ($row) {
+                return number_format($row->grand_total, 2);
+            })
+            ->editColumn('payment_status', function ($row) {
+                return $row->payment_status == 1 ? 'Paid' : 'Pending';
+            })
+            ->addColumn('action', function ($row) {
+            if ($row->status == 1) {
+                return '<button class="btn btn-secondary btn-sm" disabled><i class="fas fa-check"></i> Assigned</button>';
+            } else {
+                return '<button class="btn btn-primary btn-sm assign-btn" 
+                            data-id="' . $row->id . '" 
+                            data-name="' . $row->first_name . ' ' . $row->last_name . '">
+                        <i class="fas fa-user-plus"></i> Assign Invoice
+                    </button>';
+            }
+        })
+        ->rawColumns(['action'])
+            ->make(true);
         }
 
         return view('admin.invoices.invoices_listing');
     }
 
-    // public function assignInvoice(Request $request)
-    // {
-    //     $request->validate([
-    //         'invoice_id' => 'required|exists:invoice_clients,id',
-    //         'client_id' => 'required|exists:users,id',
-    //     ]);
+    public function assignInvoice(Request $request)
+    {
+        $invoice = NewInvoice::find($request->invoice_id);
 
-    //     $invoice = NewInvoice::find($request->invoice_id);
-    //     $invoice->uid = $request->client_id;
-    //     $invoice->status = 1; // Assigned
-    //     $invoice->save();
+        if (!$invoice) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invoice not found.'
+            ]);
+        }
 
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Invoice assigned successfully!',
-    //     ]);
-    // }
+        if ($invoice->status == 1) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invoice is already assigned.'
+            ]);
+        }
 
-    // public function search(Request $request)
-    // {
-    //     $query = User::query();
+        // Update the status to "Assigned"
+        $invoice->update(['status' => 1]);
 
-    //     if ($request->has('search')) {
-    //         $search = $request->search;
-    //         $query->where('first_name', 'like', "%$search%")
-    //             ->orWhere('last_name', 'like', "%$search%")
-    //             ->orWhere('email', 'like', "%$search%");
-    //     }
-
-    //     $clients = $query->select('id', 'first_name', 'last_name')->get();
-
-    //     return response()->json($clients);
-    // }
-
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Invoice successfully assigned.'
+        ]);
+    }
 
 }

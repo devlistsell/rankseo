@@ -34,36 +34,32 @@
                     <th>{{ trans('messages.grand_total') }}</th>
                     <th>{{ trans('messages.payment_status') }}</th>
                     <th>{{ trans('messages.assign_status') }}</th>
-                    <th>{{ trans('messages.action') }}</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <script type="text/javascript">
-    $(function () {
-        var table = $('#invoices-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: '{{ route('invoices.listing') }}',
-            columns: [
-                { data: 'uid', name: 'users.first_name' }, // Sorting by user's first name
-                { data: 'invoice_number', name: 'invoice_clients.invoice_number' },
-                { data: 'date_time', name: 'invoice_clients.date_time' },
-                { data: 'grand_total', name: 'invoice_clients.grand_total' },
-                { data: 'payment_status', name: 'invoice_clients.payment_status' },
-                { data: 'status', name: 'invoice_clients.status' },
-                { data: 'action', name: 'action', orderable: false, searchable: false },
-            ],
-            searching: true,
-        });
-    });
-</script>
+    <div class="modal" id="assignStatusModal" tabindex="-1" aria-labelledby="assignStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignStatusModalLabel">Confirm Status Change</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to assign this invoice?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmChange">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-{{--<script type="text/javascript">
-    $(document).ready(function () {
-        // Initialize DataTable
+    <!-- <script type="text/javascript">
+    $(function () {
         var table = $('#invoices-table').DataTable({
             processing: true,
             serverSide: true,
@@ -77,60 +73,99 @@
                 { data: 'status', name: 'invoice_clients.status' },
                 { data: 'action', name: 'action', orderable: false, searchable: false },
             ],
+            searching: true,
         });
 
-        // Handle Assign Button Click
-        $('#invoices-table').on('click', '.assign-btn', function () {
-            const invoiceId = $(this).data('id');
-            $('#invoiceId').val(invoiceId);
-            $('#assignModal').modal('show');
+        $(document).on('click', '.assign-btn', function() {
+            var invoiceId = $(this).data('id');
+            var invoiceName = $(this).data('name');
+
+            $('#assignStatusModal').data('invoice-id', invoiceId);
+            $('#assignStatusModalLabel').text('Assign Invoice: ' + invoiceName);
+
+            $('#assignStatusModal').modal('show');
         });
 
-        // Load Clients into Dropdown
-        $('#assignModal').on('show.bs.modal', function () {
-            $('#clientSelect').select2({
-                dropdownParent: $('#assignModal'),
-                ajax: {
-                    url: '{{ route("clients.search") }}',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            search: params.term,
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: $.map(data, function (item) {
-                                return { id: item.id, text: item.first_name + ' ' + item.last_name };
-                            }),
-                        };
-                    },
-                },
-            });
-        });
-
-        // Handle Form Submission
-        $('#assignForm').on('submit', function (e) {
-            e.preventDefault();
-            const formData = $(this).serialize();
-
+        $('#confirmChange').on('click', function() {
+            var invoiceId = $('#assignStatusModal').data('invoice-id');
+            
             $.ajax({
                 url: '{{ route("invoices.assign") }}',
-                type: 'POST',
-                data: formData,
-                success: function (response) {
-                    $('#assignModal').modal('hide');
-                    table.ajax.reload();
-                    alert(response.message);
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    invoice_id: invoiceId
                 },
-                error: function (xhr) {
-                    alert('An error occurred. Please try again.');
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert(response.message);  // Show success message
+                        $('#assignStatusModal').modal('hide');
+                        $('#invoices-table').DataTable().ajax.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
                 },
+                error: function() {
+                    alert('An error occurred while assigning the invoice.');
+                }
             });
         });
     });
-</script>--}}
+    </script> -->
+    <script type="text/javascript">
+$(function () {
+    var table = $('#invoices-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route('invoices.listing') }}',
+        columns: [
+            { data: 'uid', name: 'users.first_name' },
+            { data: 'invoice_number', name: 'invoice_clients.invoice_number' },
+            { data: 'date_time', name: 'invoice_clients.date_time' },
+            { data: 'grand_total', name: 'invoice_clients.grand_total' },
+            { data: 'payment_status', name: 'invoice_clients.payment_status' },
+            // { data: 'status', name: 'invoice_clients.status', render: function(data) {
+            //     return data === 1 ? 'Assigned' : 'Not Assigned';
+            // }},
+            { 
+                data: 'action', 
+                name: 'action', 
+                orderable: false, 
+                searchable: false 
+            },
+        ],
+        searching: true,
+    });
 
+    // Handle "Assign Invoice" button click
+    $(document).on('click', '.assign-btn', function() {
+        var invoiceId = $(this).data('id');
+        var assignButton = $(this);
 
+        if (confirm('Are you sure you want to assign this invoice?')) {
+            $.ajax({
+                url: '{{ route("invoices.assign") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    invoice_id: invoiceId
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+
+                        // Reload the DataTable to reflect the updated status
+                        table.ajax.reload(null, false);
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while assigning the invoice.');
+                }
+            });
+        }
+    });
+});
+</script>
 @endsection

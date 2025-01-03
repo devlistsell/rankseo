@@ -3521,7 +3521,7 @@
   'filter_by_ranking'=>'Filter Ranking',
   'enter_ranking'=>'Enter Ranking',
   'no_data_found'=>'No Data Found',
-  'invoices_listing'=>'Invoices Listing',
+  'invoices_listing'=>'All Invoices',
   'customer_name'=>'Client Name',
   'invoice_number'=>'Invoice Number',
   'generate_date'=>'Generate Date',

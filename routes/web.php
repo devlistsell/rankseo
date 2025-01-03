@@ -1194,10 +1194,8 @@ Route::group(['namespace' => 'Admin', 'middleware' => ['not_installed', 'auth', 
     Route::post('admin/customers/refresh/keywords', 'CustomerController@refresh_keywords')->name('admin.refreshkeyword');
     // Invoice Management
     Route::get('admin/invoices_listing', 'InvoiceController@invoicesListing')->name('invoices.listing');
-    //Route::get('/clients/search', 'ClientController@search')->name('clients.search');
-    //Route::post('/invoices/assign', 'InvoiceController@assignInvoice')->name('invoices.assign');
-
-
+    Route::post('admin/update-assign-status', 'InvoiceController@assignInvoice')->name('invoices.assign');
+    
     Route::post('admin/customers/create/invoice', 'CustomerController@create_invoice')->name('admin.create_invoice');
     
     // Admin Group

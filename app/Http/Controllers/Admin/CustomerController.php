@@ -9,6 +9,8 @@ use Acelle\Library\Facades\Hook;
 use Acelle\Model\InvoiceClient;
 use Acelle\Model\Keyword;
 use Acelle\Model\KeywordHistory;
+use Acelle\Model\RankDifficulty;
+use Acelle\Model\RankRang;
 use Google\Client;
 use Google\Service\SearchConsole;
 use Google\Service\SearchConsole\SearchAnalyticsQueryRequest;
@@ -827,13 +829,13 @@ class CustomerController extends Controller
         }
 
         $allKey = \Acelle\Model\keyword::where('uid', $clientId)->pluck('keyword')->toArray();
-        if($allKey){
+        if ($allKey) {
             $rankings = \Acelle\Helpers\keywordSearch($allKey, $clientDetail->website);
             $totalRanks = [];
             foreach ($rankings as $val) {
                 if ($val['found']) {
                     $keyId = \Acelle\Model\keyword::select('id')->where('keyword', $val['keyword'])->first();
-                    if(isset($keyId->id) && !empty($keyId->id)){
+                    if (isset($keyId->id) && !empty($keyId->id)) {
                         $rank = round($val['position'], 2);
                         $totalRanks[] = [
                             'uid' => $clientId,
@@ -841,11 +843,11 @@ class CustomerController extends Controller
                             'ranking' => $rank,
                             'date_time' => now(),
                         ];
-                        Keyword::where('id',$keyId->id)->update(['ranking'=>$rank,'date_time'=>date('Y-m-d H:i:s')]);
+                        Keyword::where('id', $keyId->id)->update(['ranking' => $rank, 'date_time' => date('Y-m-d H:i:s')]);
                     }
                 }
             }
-            if(count($totalRanks)){
+            if (count($totalRanks)) {
                 KeywordHistory::insert($totalRanks);
             }
         }
@@ -952,10 +954,73 @@ class CustomerController extends Controller
             'contact' => $contact->fill($request->old()),
         ]);
     }
-    
+
     public function create_invoice(Request $request)
     {
-dd(123);
+        $getKeywords = Keyword::select('id', 'uid', 'keyword', 'ranking', 'difficulty_id')->where('uid', $request->client_id)->get();
+        $priceKeywords = 0;
+        if (count($getKeywords)) {
+            foreach ($getKeywords as $key) {
+                $rankAvg = KeywordHistory::where('keyword_id', $key->id)->avg('ranking');
+                $rankId = $this->rank_range($rankAvg);
+                if($rankId){
+                    $price = $this->getDifficultyPrice($rankId, $key->difficulty_id);
+                    $priceKeywords += $price;
+                }
+            }
+        }
+        $latestInvoice = \Acelle\Model\InvoiceClient::latest('id')->first();
+        $nextId = $latestInvoice ? $latestInvoice->id + 1 : 1;
+        $invoice_no = 'INV-' . date('Ymd') . '-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+
+        $invoice = new \Acelle\Model\InvoiceClient();
+        $invoice->uid = $request->client_id;
+        $invoice->invoice_number = $invoice_no;
+        $invoice->grand_total = $priceKeywords;
+        if ($invoice->save()) {
+            $request->session()->flash('alert-success', 'keyword added successfully');
+            return response()->json(['status' => true]);
+        }else{
+            $request->session()->flash('alert-error', 'Something went wrong');
+            return response()->json(['status' => false]);
+        }
     }
 
+    public function rank_range($rankAvg)
+    {
+        $ranges = RankRang::all();
+        $value = $rankAvg;
+        foreach ($ranges as $range) {
+            if ($value >= $range->min_value && $value <= $range->max_value) {
+                return $range->id; // Return the matching rank
+            }
+        }
+        return '';
+    }
+
+    public function getDifficultyPrice($rankId, $score)
+    {
+        if($score == 1){
+            $min_score = 1;
+            $max_score = 49;
+        }else if($score == 2){
+            $min_score = 50;
+            $max_score = 69;
+        } else if($score == 3){
+            $min_score = 70;
+            $max_score = 10000;
+        } else{
+            $min_score = 0;
+            $max_score = 0;
+        }
+        $difficulty = RankDifficulty::where('rank_rang_id', $rankId)
+        ->where('min_score', '<=', $min_score)
+        ->where('max_score', '>=', $max_score)
+        ->first();
+
+        // Return the price if a match is found, or a default message
+        return $difficulty ? $difficulty->price : 'No matching difficulty found';
+    }
+
+    
 }

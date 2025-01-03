@@ -45,16 +45,16 @@
                     </a>
                 </li>
 
-                <li class="nav-item {{ $menu == 'contact' ? 'active' : '' }}">
+                <!-- <li class="nav-item {{ $menu == 'contact' ? 'active' : '' }}">
                     <a title="{{ trans('messages.contact_information') }}" href="{{ action("AccountController@contact") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
                         <i class="navbar-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 18"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M16,6h2V4H16Zm0,4h2V8H16Zm0,4h2V12H16Zm0,4V16h4V2H11V3.4L9,2A1.8,1.8,0,0,1,9.6.6,2,2,0,0,1,11,0h9a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,22,2V16a2.1,2.1,0,0,1-2,2ZM0,17V9a2.9,2.9,0,0,1,.2-.9,2.3,2.3,0,0,1,.7-.7l5-3.6A2,2,0,0,1,7,3.5a2.7,2.7,0,0,1,1.2.3l5,3.6.6.7A2.9,2.9,0,0,1,14,9v8a1,1,0,0,1-1,1H8V13H6v5H1a.9.9,0,0,1-.7-.3A.9.9,0,0,1,0,17Zm2-1H4V11h6v5h2V9L7,5.5,2,9Zm8,0V11H4v0h6Z" style="fill:#f2f2f2"/></g></g></svg>
                         </i>
                         <span>{{ trans('messages.contact_information') }}</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="nav-item {{ $menu == 'billing' ? 'active' : '' }}">
+                <!-- <li class="nav-item {{ $menu == 'billing' ? 'active' : '' }}">
                     <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@billing") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
                         <i class="navbar-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 16"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M20,2V14a2.1,2.1,0,0,1-2,2H2a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,14V2A2,2,0,0,1,.6.6,2,2,0,0,1,2,0H18a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,20,2ZM2,4H18V2H2ZM2,8v6H18V8Zm0,6v0Z" style="fill:#f2f2f2"/></g></g></svg>
@@ -87,11 +87,11 @@
                         </i>
                         <span>{{ trans('messages.api') }}</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
             <div class="navbar-right">
                 <ul class="navbar-nav me-auto mb-md-0">
-                    @include('layouts.core._top_activity_log')
+                    <!-- @include('layouts.core._top_activity_log') -->
                     @include('layouts.core._menu_frontend_user')
                 </ul>
             </div>

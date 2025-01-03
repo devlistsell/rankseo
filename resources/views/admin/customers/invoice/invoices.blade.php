@@ -156,9 +156,6 @@
             $(".generateInvoiceBtn").click(function() {
                 $('#generateInvoice').modal('show');
             });
-            $(".createInvoice").click(function() {
-                alert();
-            });
             //Generate Invoice Section
             $(".createInvoice").click(function() {
                 $.ajax({
@@ -171,7 +168,7 @@
                     },
                     success: function(response) {
                         if (response.status == false) {
-                            $('.keyword_exist_error').removeClass('hide');
+                            location.reload();
                         } else if (response.status == true) {
                             location.reload();
                         } else {

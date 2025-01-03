@@ -3518,7 +3518,7 @@
   'filter_by_ranking'=>'Ranking filtern',
   'enter_ranking'=>'Ranking eingeben',
   'no_data_found'=>'Keine Daten gefunden',
-  'invoices_listing'=>'Auflistung der Rechnungen',
+  'invoices_listing'=>'Alle Rechnungen',
   'customer_name'=>'Name des Kunden',
   'invoice_number'=>'Name des Kunden',
   'generate_date'=>'Name des Kunden',

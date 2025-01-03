@@ -7,8 +7,8 @@ use Acelle\Http\Controllers\Controller;
 use Acelle\Model\Invoice;
 use Acelle\Model\Transaction;
 use Acelle\Model\Customer;
-use DataTables;
-use Acelle\Model\NewInvoice;
+use Acelle\Model\NewInvoice; // Correct model namespace
+use Yajra\DataTables\DataTables;
 
 class InvoiceController extends Controller
 {
@@ -237,29 +237,38 @@ class InvoiceController extends Controller
 
     public function invoicesListing(Request $request)
     {
-        //dd($request);
-        $user = $request->user();
-
-        if (!$user) {
+        if (!$request->user()) {
             return redirect()->route('login');
         }
 
         if ($request->ajax()) {
-            $invoices = NewInvoice::query();
+            $invoices = NewInvoice::query()
+                ->leftJoin('users', 'invoice_clients.uid', '=', 'users.id') // Join with the users table
+                ->select('invoice_clients.*', 'users.first_name', 'users.last_name'); // Select required columns
 
             // Search functionality
             if ($request->has('search') && $request->search['value']) {
                 $searchTerm = $request->search['value'];
-                $invoices = $invoices->where('uid', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('invoice_number', 'like', '%' . $searchTerm . '%');
+                $invoices = $invoices->where(function ($query) use ($searchTerm) {
+                    $query->where('invoice_clients.invoice_number', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('users.first_name', 'like', '%' . $searchTerm . '%')
+                        ->orWhere('users.last_name', 'like', '%' . $searchTerm . '%');
+                });
             }
 
             // Sorting functionality
             if ($request->has('order')) {
                 $orderColumnIndex = $request->order[0]['column'];
-                $orderDirection = $request->order[0]['dir']; // 'asc' or 'desc'
+                $orderDirection = $request->order[0]['dir'];
 
-                $columns = ['uid', 'date_time', 'grand_total', 'payment_status', 'status'];
+                $columns = [
+                    'users.first_name', // Sorting by user's first name
+                    'invoice_clients.invoice_number',
+                    'invoice_clients.date_time',
+                    'invoice_clients.grand_total',
+                    'invoice_clients.payment_status',
+                    'invoice_clients.status',
+                ];
 
                 if (isset($columns[$orderColumnIndex])) {
                     $invoices = $invoices->orderBy($columns[$orderColumnIndex], $orderDirection);
@@ -269,7 +278,7 @@ class InvoiceController extends Controller
             return DataTables::of($invoices)
                 ->addIndexColumn()
                 ->editColumn('uid', function ($row) {
-                    return 'Customer ' . $row->uid;
+                    return $row->first_name && $row->last_name ? "{$row->first_name} {$row->last_name}" : 'Unknown User';
                 })
                 ->editColumn('date_time', function ($row) {
                     return date('Y-m-d', strtotime($row->date_time));
@@ -283,13 +292,57 @@ class InvoiceController extends Controller
                 ->editColumn('status', function ($row) {
                     return $row->status == 1 ? 'Assigned' : 'Not Assigned';
                 })
+                // ->addColumn('action', function ($row) {
+                //     return '<a href="#" class="btn btn-primary btn-sm"><i class="fas fa-eye" title="View Details"></i></a>';
+                // })
                 ->addColumn('action', function ($row) {
-                    return '<a href="#" class="btn btn-primary btn-sm"><i class="fas fa-eye" title="View Details"></i></a>';
-                })
+                    return '<button class="btn btn-primary btn-sm assign-btn" 
+                                    data-id="' . $row->id . '" 
+                                    data-name="' . $row->first_name . ' ' . $row->last_name . '">
+                                <i class="fas fa-user-plus"></i> Assign Invoice
+                            </button>';
+                    })
+                    ->rawColumns(['action'])
                 ->rawColumns(['action'])
                 ->make(true);
         }
 
         return view('admin.invoices.invoices_listing');
     }
+
+    // public function assignInvoice(Request $request)
+    // {
+    //     $request->validate([
+    //         'invoice_id' => 'required|exists:invoice_clients,id',
+    //         'client_id' => 'required|exists:users,id',
+    //     ]);
+
+    //     $invoice = NewInvoice::find($request->invoice_id);
+    //     $invoice->uid = $request->client_id;
+    //     $invoice->status = 1; // Assigned
+    //     $invoice->save();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Invoice assigned successfully!',
+    //     ]);
+    // }
+
+    // public function search(Request $request)
+    // {
+    //     $query = User::query();
+
+    //     if ($request->has('search')) {
+    //         $search = $request->search;
+    //         $query->where('first_name', 'like', "%$search%")
+    //             ->orWhere('last_name', 'like', "%$search%")
+    //             ->orWhere('email', 'like', "%$search%");
+    //     }
+
+    //     $clients = $query->select('id', 'first_name', 'last_name')->get();
+
+    //     return response()->json($clients);
+    // }
+
+
 }

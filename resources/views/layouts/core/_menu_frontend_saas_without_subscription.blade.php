@@ -45,53 +45,53 @@
                     </a>
                 </li>
 
-                <!-- <li class="nav-item {{ $menu == 'contact' ? 'active' : '' }}">
-                    <a title="{{ trans('messages.contact_information') }}" href="{{ action("AccountController@contact") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
-                        <i class="navbar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 18"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M16,6h2V4H16Zm0,4h2V8H16Zm0,4h2V12H16Zm0,4V16h4V2H11V3.4L9,2A1.8,1.8,0,0,1,9.6.6,2,2,0,0,1,11,0h9a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,22,2V16a2.1,2.1,0,0,1-2,2ZM0,17V9a2.9,2.9,0,0,1,.2-.9,2.3,2.3,0,0,1,.7-.7l5-3.6A2,2,0,0,1,7,3.5a2.7,2.7,0,0,1,1.2.3l5,3.6.6.7A2.9,2.9,0,0,1,14,9v8a1,1,0,0,1-1,1H8V13H6v5H1a.9.9,0,0,1-.7-.3A.9.9,0,0,1,0,17Zm2-1H4V11h6v5h2V9L7,5.5,2,9Zm8,0V11H4v0h6Z" style="fill:#f2f2f2"/></g></g></svg>
-                        </i>
-                        <span>{{ trans('messages.contact_information') }}</span>
-                    </a>
-                </li> -->
-
-                <!-- <li class="nav-item {{ $menu == 'billing' ? 'active' : '' }}">
-                    <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@billing") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
-                        <i class="navbar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 16"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M20,2V14a2.1,2.1,0,0,1-2,2H2a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,14V2A2,2,0,0,1,.6.6,2,2,0,0,1,2,0H18a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,20,2ZM2,4H18V2H2ZM2,8v6H18V8Zm0,6v0Z" style="fill:#f2f2f2"/></g></g></svg>
-                        </i>
-                        <span>{{ trans('messages.billing') }}</span>
-                    </a>
-                </li>
-
-                <li class="nav-item {{ $menu == 'subscription' ? 'active' : '' }}">
-                    <a title="{{ trans('messages.billing') }}" href="{{ action("SubscriptionController@index") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
-                        <i class="navbar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 20"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M2,20a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,18V4A2,2,0,0,1,.6,2.6,2,2,0,0,1,2,2H6.2A2.6,2.6,0,0,1,7.3.6a2.7,2.7,0,0,1,3.4,0A2.6,2.6,0,0,1,11.8,2H16a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,18,4V18a2.1,2.1,0,0,1-2,2Zm0-2H16V4H2Zm3-2h5a1,1,0,0,0,.7-1.7A.9.9,0,0,0,10,14H5a.9.9,0,0,0-.7.3,1,1,0,0,0,0,1.4A.9.9,0,0,0,5,16Zm0-4h8a1,1,0,0,0,1-1,1,1,0,0,0-1-1H5a.9.9,0,0,0-.7.3,1,1,0,0,0,0,1.4A.9.9,0,0,0,5,12ZM5,8h8a1,1,0,0,0,1-1,1,1,0,0,0-1-1H5a.9.9,0,0,0-.7.3,1,1,0,0,0,0,1.4A.9.9,0,0,0,5,8ZM9,3.3A.5.5,0,0,0,9.5,3a.6.6,0,0,0,0-1c-.1-.2-.3-.2-.5-.2s-.4,0-.5.2-.2.3-.2.5,0,.4.2.5A.5.5,0,0,0,9,3.3ZM2,18v0Z" style="fill:#f2f2f2"/></g></g></svg>
-                        </i>
-                        <span>{{ trans('messages.subscription') }}</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item {{ $menu == 'log' ? 'active' : '' }}">
-                    <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@logs") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
-                        <i class="navbar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 16"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M2,16a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,14V10.6a.5.5,0,0,1,.2-.4c.1-.2.2-.3.4-.3a1.8,1.8,0,0,0,1-.7,2,2,0,0,0,0-2.4,1.8,1.8,0,0,0-1-.7L.2,5.9C.1,5.7,0,5.6,0,5.4V2A2,2,0,0,1,.6.6,2,2,0,0,1,2,0H18a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,20,2V5.4c0,.2-.1.3-.2.5a.5.5,0,0,1-.4.2,1.8,1.8,0,0,0-1,.7,2,2,0,0,0,0,2.4,1.8,1.8,0,0,0,1,.7c.2,0,.3.1.4.3a.5.5,0,0,1,.2.4V14a2.1,2.1,0,0,1-2,2Zm0-2H18V11.5A5.4,5.4,0,0,1,16.5,10,4.6,4.6,0,0,1,16,8a4.6,4.6,0,0,1,.5-2A4,4,0,0,1,18,4.6V2H2V4.6A4,4,0,0,1,3.5,6,4.6,4.6,0,0,1,4,8a4.6,4.6,0,0,1-.5,2A5.4,5.4,0,0,1,2,11.5Zm8-1a1,1,0,0,0,.7-1.7,1,1,0,0,0-1.4,0A1,1,0,0,0,10,13Zm0-4a1,1,0,0,0,1-1,1,1,0,0,0-1-1A1,1,0,0,0,9,8a1,1,0,0,0,1,1Zm0-4a.9.9,0,0,0,.7-.3A.9.9,0,0,0,11,4a.9.9,0,0,0-.3-.7,1,1,0,0,0-1.4,0A.9.9,0,0,0,9,4a.9.9,0,0,0,.3.7A.9.9,0,0,0,10,5Z" style="fill:#f2f2f2"/></g></g></svg>
-                        </i>
-                        <span>{{ trans('messages.logs') }}</span>
-                    </a>
-                </li>
-                <li class="nav-item {{ $menu == 'api' ? 'active' : '' }}">
-                    <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@api") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
-                        <i class="navbar-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 12"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M6,12a5.7,5.7,0,0,1-4.2-1.7A5.8,5.8,0,0,1,0,6,5.4,5.4,0,0,1,1.8,1.8,5.4,5.4,0,0,1,6,0,6.1,6.1,0,0,1,9,.8,6.6,6.6,0,0,1,11.2,3H20a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,22,5V7a1.8,1.8,0,0,1-.6,1.4A1.8,1.8,0,0,1,20,9v1a1.8,1.8,0,0,1-.6,1.4A1.8,1.8,0,0,1,18,12H16a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,14,10V9H11.2A6.6,6.6,0,0,1,9,11.2,6.1,6.1,0,0,1,6,12Zm0-2A3.6,3.6,0,0,0,8.7,9,5.3,5.3,0,0,0,9.9,7H16v3h2V7h2V5H9.9A6.2,6.2,0,0,0,8.7,3,3.6,3.6,0,0,0,6,2,3.8,3.8,0,0,0,3.2,3.2,3.8,3.8,0,0,0,2,6,3.8,3.8,0,0,0,3.2,8.8,3.8,3.8,0,0,0,6,10ZM6,8a1.8,1.8,0,0,0,1.4-.6A1.8,1.8,0,0,0,8,6a2,2,0,0,0-.6-1.4A1.8,1.8,0,0,0,6,4,2.1,2.1,0,0,0,4,6a1.8,1.8,0,0,0,.6,1.4A2,2,0,0,0,6,8Z" style="fill:#f2f2f2"/></g></g></svg>
-                        </i>
-                        <span>{{ trans('messages.api') }}</span>
-                    </a>
-                </li> -->
+                {{--<li class="nav-item {{ $menu == 'contact' ? 'active' : '' }}">
+                                                    <a title="{{ trans('messages.contact_information') }}" href="{{ action("AccountController@contact") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
+                                                        <i class="navbar-icon">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 18"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M16,6h2V4H16Zm0,4h2V8H16Zm0,4h2V12H16Zm0,4V16h4V2H11V3.4L9,2A1.8,1.8,0,0,1,9.6.6,2,2,0,0,1,11,0h9a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,22,2V16a2.1,2.1,0,0,1-2,2ZM0,17V9a2.9,2.9,0,0,1,.2-.9,2.3,2.3,0,0,1,.7-.7l5-3.6A2,2,0,0,1,7,3.5a2.7,2.7,0,0,1,1.2.3l5,3.6.6.7A2.9,2.9,0,0,1,14,9v8a1,1,0,0,1-1,1H8V13H6v5H1a.9.9,0,0,1-.7-.3A.9.9,0,0,1,0,17Zm2-1H4V11h6v5h2V9L7,5.5,2,9Zm8,0V11H4v0h6Z" style="fill:#f2f2f2"/></g></g></svg>
+                                                        </i>
+                                                        <span>{{ trans('messages.contact_information') }}</span>
+                                                    </a>
+                                                </li>
+                                
+                                                <li class="nav-item {{ $menu == 'billing' ? 'active' : '' }}">
+                                                    <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@billing") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
+                                                        <i class="navbar-icon">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 16"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M20,2V14a2.1,2.1,0,0,1-2,2H2a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,14V2A2,2,0,0,1,.6.6,2,2,0,0,1,2,0H18a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,20,2ZM2,4H18V2H2ZM2,8v6H18V8Zm0,6v0Z" style="fill:#f2f2f2"/></g></g></svg>
+                                                        </i>
+                                                        <span>{{ trans('messages.billing') }}</span>
+                                                    </a>
+                                                </li>
+                                
+                                                <li class="nav-item {{ $menu == 'subscription' ? 'active' : '' }}">
+                                                    <a title="{{ trans('messages.billing') }}" href="{{ action("SubscriptionController@index") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
+                                                        <i class="navbar-icon">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 20"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M2,20a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,18V4A2,2,0,0,1,.6,2.6,2,2,0,0,1,2,2H6.2A2.6,2.6,0,0,1,7.3.6a2.7,2.7,0,0,1,3.4,0A2.6,2.6,0,0,1,11.8,2H16a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,18,4V18a2.1,2.1,0,0,1-2,2Zm0-2H16V4H2Zm3-2h5a1,1,0,0,0,.7-1.7A.9.9,0,0,0,10,14H5a.9.9,0,0,0-.7.3,1,1,0,0,0,0,1.4A.9.9,0,0,0,5,16Zm0-4h8a1,1,0,0,0,1-1,1,1,0,0,0-1-1H5a.9.9,0,0,0-.7.3,1,1,0,0,0,0,1.4A.9.9,0,0,0,5,12ZM5,8h8a1,1,0,0,0,1-1,1,1,0,0,0-1-1H5a.9.9,0,0,0-.7.3,1,1,0,0,0,0,1.4A.9.9,0,0,0,5,8ZM9,3.3A.5.5,0,0,0,9.5,3a.6.6,0,0,0,0-1c-.1-.2-.3-.2-.5-.2s-.4,0-.5.2-.2.3-.2.5,0,.4.2.5A.5.5,0,0,0,9,3.3ZM2,18v0Z" style="fill:#f2f2f2"/></g></g></svg>
+                                                        </i>
+                                                        <span>{{ trans('messages.subscription') }}</span>
+                                                    </a>
+                                                </li>
+                                                
+                                                <li class="nav-item {{ $menu == 'log' ? 'active' : '' }}">
+                                                    <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@logs") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
+                                                        <i class="navbar-icon">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 16"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M2,16a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,0,14V10.6a.5.5,0,0,1,.2-.4c.1-.2.2-.3.4-.3a1.8,1.8,0,0,0,1-.7,2,2,0,0,0,0-2.4,1.8,1.8,0,0,0-1-.7L.2,5.9C.1,5.7,0,5.6,0,5.4V2A2,2,0,0,1,.6.6,2,2,0,0,1,2,0H18a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,20,2V5.4c0,.2-.1.3-.2.5a.5.5,0,0,1-.4.2,1.8,1.8,0,0,0-1,.7,2,2,0,0,0,0,2.4,1.8,1.8,0,0,0,1,.7c.2,0,.3.1.4.3a.5.5,0,0,1,.2.4V14a2.1,2.1,0,0,1-2,2Zm0-2H18V11.5A5.4,5.4,0,0,1,16.5,10,4.6,4.6,0,0,1,16,8a4.6,4.6,0,0,1,.5-2A4,4,0,0,1,18,4.6V2H2V4.6A4,4,0,0,1,3.5,6,4.6,4.6,0,0,1,4,8a4.6,4.6,0,0,1-.5,2A5.4,5.4,0,0,1,2,11.5Zm8-1a1,1,0,0,0,.7-1.7,1,1,0,0,0-1.4,0A1,1,0,0,0,10,13Zm0-4a1,1,0,0,0,1-1,1,1,0,0,0-1-1A1,1,0,0,0,9,8a1,1,0,0,0,1,1Zm0-4a.9.9,0,0,0,.7-.3A.9.9,0,0,0,11,4a.9.9,0,0,0-.3-.7,1,1,0,0,0-1.4,0A.9.9,0,0,0,9,4a.9.9,0,0,0,.3.7A.9.9,0,0,0,10,5Z" style="fill:#f2f2f2"/></g></g></svg>
+                                                        </i>
+                                                        <span>{{ trans('messages.logs') }}</span>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item {{ $menu == 'api' ? 'active' : '' }}">
+                                                    <a title="{{ trans('messages.billing') }}" href="{{ action("AccountController@api") }}" class="leftbar-tooltip nav-link d-flex align-items-center py-3 lvl-1">
+                                                        <i class="navbar-icon">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 12"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path d="M6,12a5.7,5.7,0,0,1-4.2-1.7A5.8,5.8,0,0,1,0,6,5.4,5.4,0,0,1,1.8,1.8,5.4,5.4,0,0,1,6,0,6.1,6.1,0,0,1,9,.8,6.6,6.6,0,0,1,11.2,3H20a1.8,1.8,0,0,1,1.4.6A2,2,0,0,1,22,5V7a1.8,1.8,0,0,1-.6,1.4A1.8,1.8,0,0,1,20,9v1a1.8,1.8,0,0,1-.6,1.4A1.8,1.8,0,0,1,18,12H16a2,2,0,0,1-1.4-.6A1.8,1.8,0,0,1,14,10V9H11.2A6.6,6.6,0,0,1,9,11.2,6.1,6.1,0,0,1,6,12Zm0-2A3.6,3.6,0,0,0,8.7,9,5.3,5.3,0,0,0,9.9,7H16v3h2V7h2V5H9.9A6.2,6.2,0,0,0,8.7,3,3.6,3.6,0,0,0,6,2,3.8,3.8,0,0,0,3.2,3.2,3.8,3.8,0,0,0,2,6,3.8,3.8,0,0,0,3.2,8.8,3.8,3.8,0,0,0,6,10ZM6,8a1.8,1.8,0,0,0,1.4-.6A1.8,1.8,0,0,0,8,6a2,2,0,0,0-.6-1.4A1.8,1.8,0,0,0,6,4,2.1,2.1,0,0,0,4,6a1.8,1.8,0,0,0,.6,1.4A2,2,0,0,0,6,8Z" style="fill:#f2f2f2"/></g></g></svg>
+                                                        </i>
+                                                        <span>{{ trans('messages.api') }}</span>
+                                                    </a>
+                                                </li>--}}
             </ul>
             <div class="navbar-right">
                 <ul class="navbar-nav me-auto mb-md-0">
-                    <!-- @include('layouts.core._top_activity_log') -->
+                    {{--@include('layouts.core._top_activity_log')--}}
                     @include('layouts.core._menu_frontend_user')
                 </ul>
             </div>
